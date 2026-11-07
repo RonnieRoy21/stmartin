@@ -20,8 +20,7 @@ function LoginForm(){
 
     const handleLogin=async()=>{
         if(email.trim().length === 0 || passwd.trim().length === 0){
-            window.alert("Please enter email and password")
-            return
+           return window.alert("Please enter email and password") 
         }
         const response=await db.loginCounsellor(email,passwd)
         if(typeof response === "boolean"){
