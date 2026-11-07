@@ -50,6 +50,7 @@ function AdminLogin(){
             }
             return window.alert(response.statusText)
             }catch(err){
+                setAttemptingLogin(false)
                 return window.alert(err)
             }
             
