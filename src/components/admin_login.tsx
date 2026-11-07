@@ -1,4 +1,4 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import { Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import Database from "../database/supabase_db";
@@ -10,10 +10,11 @@ function AdminLogin(){
 
     const navigate=useNavigate()
     const adminUrl=import.meta.env.VITE_ADMIN_URL;
-    const [adminEmail,setAdminEmail]=useState<string>("")
-    const [adminPassword,setAdminPassword]=useState<string>("")
-    const [adminTotp,setAdminTotp]=useState<string>("")
-    const [otpFieldEnabled,setOtpFieldEnabled]=useState<boolean>(false)
+    const [adminEmail,setAdminEmail]=useState<string>("");
+    const [adminPassword,setAdminPassword]=useState<string>("");
+    const [adminTotp,setAdminTotp]=useState<string>("");
+    const [otpFieldEnabled,setOtpFieldEnabled]=useState<boolean>(false);
+    const [attemptingLogin,setAttemptingLogin]=useState<boolean>(false);
 
 
 
@@ -28,26 +29,34 @@ function AdminLogin(){
         }
 
         const db=new Database()
+        
         const token=await db.adminSignIn(adminEmail,adminPassword)
         
         
         if (token !== undefined && token !== null){
-            console.log(token);
+            setAttemptingLogin(true)
+            try{
 
-            //get code
-            const response= await axios.get(`${adminUrl}/admin/verification`,{
+                const response= await axios.get(`${adminUrl}/admin/verification`,{
                 headers:{
                     "Content-Type":"application/json",
                     "Authorization":`Bearer ${token}`
                 }
             })
             if (response.status === 200){
+                setAttemptingLogin(false)
                 setOtpFieldEnabled(true)
                 return window.alert(response.data['message'])
             }
+            return window.alert(response.statusText)
+            }catch(err){
+                return window.alert(err)
+            }
+            
 
-           return window.alert(response.statusText)    
+               
     }
+    setAttemptingLogin(false)
 }
 
     const handleVerification=async (code:string)=>{
@@ -96,9 +105,12 @@ function AdminLogin(){
         />
 
         <Stack spacing={'5%'} direction ={'row'} sx={{marginTop:'2%',}}>
+            {attemptingLogin? 
+            <CircularProgress color='secondary' aria-label="Signing In" />
+            :
             <Button disabled={otpFieldEnabled} 
             onClick={()=>handleAdminLogin()}
-            >Login</Button>
+            >Login</Button>}
 
 
             <Button variant="contained" disabled={!otpFieldEnabled} onClick={()=>handleVerification(adminTotp.toString())}>Verify Code</Button>
