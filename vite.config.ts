@@ -5,8 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: [
-      "https://stmartincounsellors.vercel.app",
-      "https://stmartin.onrender.com"
+      "stmartincounsellors.vercel.app",
     ]
   }
 })
