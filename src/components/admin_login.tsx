@@ -9,7 +9,7 @@ import axios from 'axios'
 function AdminLogin(){
 
     const navigate=useNavigate()
-
+    const adminUrl=import.meta.env.VITE_ADMIN_URL;
     const [adminEmail,setAdminEmail]=useState<string>("")
     const [adminPassword,setAdminPassword]=useState<string>("")
     const [adminTotp,setAdminTotp]=useState<string>("")
@@ -35,7 +35,7 @@ function AdminLogin(){
             console.log(token);
 
             //get code
-            const response= await axios.get("http://localhost:8000/admin/verification",{
+            const response= await axios.get(`${adminUrl}/admin/verification`,{
                 headers:{
                     "Content-Type":"application/json",
                     "Authorization":`Bearer ${token}`
@@ -52,7 +52,7 @@ function AdminLogin(){
 
     const handleVerification=async (code:string)=>{
 
-        const response=await axios.post(`http://localhost:8000/admin/verify-code/${code}`,{},{
+        const response=await axios.post(`${adminUrl}/admin/verify-code/${code}`,{},{
             headers:{
                 "Content-Type":"application/json",
             }
