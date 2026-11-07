@@ -68,7 +68,6 @@ class Database{
                 'phone_number':details.phone_number
             }).select()
             if (error !== null){
-                window.alert("Error."+error.message+"\nHint"+error.hint+".")
                 return error.message
             }
             return true
@@ -102,12 +101,8 @@ class Database{
                 const {data,error}=await this.supabase.from("schedules").select(`counsellor_id,time,date,day,month,year,counsellors(
                     id,name)`)
                 if (error){
-                    console.log(error.message);
-                    
-                    window.alert()
                     return "Schedules not fetched."
                 }
-                console.log(data)
                 const rows: CounsellorSchedule[] =data
                 return rows
             }
