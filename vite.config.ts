@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: [
-      'outnumber-monotype-silo.ngrok-free.dev'
+      "https://stmartincounsellors.vercel.app",
+      "https://stmartin.onrender.com"
     ]
   }
 })
