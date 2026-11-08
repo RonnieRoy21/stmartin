@@ -2,7 +2,7 @@
 
 
 interface Counsellor{
-    id:string | null;
+    role:string ;
     name:string;
     phone_number:string;
     email:string;

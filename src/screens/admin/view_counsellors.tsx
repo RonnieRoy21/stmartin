@@ -2,6 +2,7 @@ import  { Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRo
 import type { Counsellor } from "../../models/counsellor_model";
 import { useEffect ,useState} from "react";
 import Database from "../../database/supabase_db";
+import axios from "axios";
 
 
 
@@ -10,16 +11,26 @@ function ViewCounsellors(){
 
 
     const db=new Database()
+    const adminUrl=import.meta.env.VITE_ADMIN_URL
     const [counsellors_data,setCounsellorsData]=useState<Counsellor[]>([])
 
     useEffect(()=>{
         //fetch counsellors
         const getCounsellors=async()=>{
-            const res=await db.fetchAllCounsellors()
-            if (typeof res === "string"){
-                return window.alert(res)
+            const token=await db.getToken();
+            if(typeof token === "boolean"){
+                return window.alert("Session is expired,try to login again")
             }
-            setCounsellorsData(res)
+            const res=await axios.get(`${adminUrl}/counsellors/profiles`,{
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":`Bearer ${token}`
+                }
+            })
+            if ( res.status !== 200){
+                return window.alert(res.statusText)
+            }
+            setCounsellorsData(res.data)
         }
         getCounsellors();
     },[])
@@ -35,6 +46,7 @@ function ViewCounsellors(){
                     <TableCell>EMAIL</TableCell>
                     <TableCell>NAME</TableCell>
                     <TableCell>PHONE NUMBER</TableCell>
+                    <TableCell>REGISTERED AS</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -43,7 +55,8 @@ function ViewCounsellors(){
                     <TableRow key={index.toString()}>
                         <TableCell>{d.email}</TableCell>
                         <TableCell>{d.name}</TableCell>
-                        <TableCell>{d.phone_number}</TableCell>                
+                        <TableCell>{d.phone_number}</TableCell> 
+                        <TableCell>{d.role}</TableCell>               
                     </TableRow>
                     </>
                 })}
