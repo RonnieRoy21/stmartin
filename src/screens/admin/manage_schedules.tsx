@@ -1,60 +1,82 @@
-import {List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
+import {Card, CircularProgress, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import Database from "../../database/supabase_db";
-import type { CounsellorSchedule } from "../../models/counsellor_model";
+import axios from "axios";
+import type { SetSchedules } from "../../models/schedule_item";
 
 
 
 function ManageSchedules(){
 
     const db= new Database()
-    const [schedules,setSchedules]=useState<CounsellorSchedule[] >([])
+    const [schedules,setSchedules]=useState<SetSchedules[] >([])
+    const [isLoading,setIsLoading]=useState<boolean>(true)
 
     useEffect(()=>{
+
         const fetchSchedules=async()=>{
-            const result=await db.adminGetAllSchedules() 
-            if (typeof result === "string"){
-                return window.alert(result)
+        
+        const token =await db.getToken();
+        if (typeof token === "boolean"){
+            return window.alert("Session may be expired, try to login again.")
+        }
+        setIsLoading(true)
+        const result=await axios.get("http://localhost:8000/admin/counsellors/schedules",{
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":`Bearer ${token}`
+                }
+            }) 
+
+            if ( result.status !== 200 ){
+                return window.alert(result.statusText)
             }
-            if(result !== undefined && result?.length > 0){
-                 setSchedules(result) 
-            }
+            setIsLoading(false)
+            setSchedules(result.data)
           
         }
         fetchSchedules();
+        
     },[])
+
+
+    
     return <>
     <Stack>
-        <Typography>Manage Schedules</Typography>
-        { schedules !== null && schedules.length > 0 ?
+        <Typography>All Counsellors'  Schedules</Typography>
+        { (isLoading && (schedules === null || schedules.length < 0))?
+        <>
+            <CircularProgress color="secondary" aria-label="Loading schedules ..." title="Loading schedules ..."/>
+            <Typography>Loading ...</Typography>
+        </> :
         <List>
             {
-                schedules.map((s:CounsellorSchedule,index)=>{
-                    console.log("One log is "+s.day);
-                    console.log("One log is "+s.month);
-                    console.log("One log is "+s.year);
-                    console.log("One log is "+s.date);
-                    console.log("One log is "+s.time);
-                    console.log("Counsellors is "+s.counsellors[0]);
+                schedules.map((s:SetSchedules,index)=>{
                     
                     return <>
-                    <ListItem key={index}>
-                        <Stack direction={'row'} spacing={1}>
-                            <Stack spacing={2}> 
-                            <ListItemText>{s.counsellors[0].id}</ListItemText>
-                            <ListItemText>{s.month},{s.year}</ListItemText>
-                        </Stack>
-                        <Stack spacing={2}>
-                            <ListItemText>{s.day}</ListItemText>
-                            <ListItemText>{s.time}</ListItemText>
-                        </Stack>
+                    <ListItem >
+                        <Card key={index} sx={{padding:'2%'}}>
+                          
+                        <Stack  spacing={1}>
+                                <Stack direction={'row'} spacing={2}> 
+                                    <ListItemText>Name: {s.counsellors.name}</ListItemText>
+                                    <ListItemText>{s.day},Date {s.date}</ListItemText>
+                                    <ListItemText>Time: {s.time}</ListItemText>
+                                </Stack>
+                                <Stack spacing={2}>
+                                    <ListItemText>Month/Year :{s.month},{s.year}</ListItemText>
+                                </Stack>
                         </Stack>
                         <ListItemText></ListItemText>
+                        
+                        </Card>
                     </ListItem>
                     </>
                 })
             }
-        </List>:<Typography>Counsellors haven't set their availability dates</Typography>}
+        </List>
+       
+        }
 
     </Stack>
     </>

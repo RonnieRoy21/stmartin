@@ -6,7 +6,7 @@ function ManageEvents(){
 
 
     return <>
-    <Typography>Manage Events</Typography>
+    <Typography>Manage Events - Coming Soon</Typography>
     </>
 }
 

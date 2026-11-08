@@ -9,7 +9,7 @@ import axios from 'axios'
 function AdminLogin(){
 
     const navigate=useNavigate()
-    const adminUrl=import.meta.env.VITE_ADMIN_URL;
+    const adminUrl="http://localhost:8000";
     const [adminEmail,setAdminEmail]=useState<string>("");
     const [adminPassword,setAdminPassword]=useState<string>("");
     const [adminTotp,setAdminTotp]=useState<string>("");
@@ -48,10 +48,10 @@ function AdminLogin(){
                 setOtpFieldEnabled(true)
                 return window.alert(response.data['message'])
             }
-            return window.alert(response.statusText)
+            return window.alert(response.statusText.split(":")[1])
             }catch(err){
                 setAttemptingLogin(false)
-                return window.alert(err)
+                return window.alert(String(err).split(":")[1])
             }
             
 

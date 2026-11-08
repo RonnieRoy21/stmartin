@@ -1,30 +1,28 @@
 import  { Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import type { Counsellor } from "../../models/counsellor_model";
+import { useEffect ,useState} from "react";
+import Database from "../../database/supabase_db";
 
 
 
 
 function ViewCounsellors(){
 
-    const counsellors_data:Counsellor[]=[
-        {
-            "id":"0",
-            'name':"c1",
-            "email":"c1@gmail.com",
-            "phone_number":"0712447933"
-        },{
-            "id":"1",
-            "phone_number":"0766289333",
-            "name":"c2",
-            "email":"c2@gmail.com"
-        },
-        {
-            "id":"2",
-            "phone_number":"0738665990",
-            "name":"c3",
-            "email":"c3@gmail.com"
+
+    const db=new Database()
+    const [counsellors_data,setCounsellorsData]=useState<Counsellor[]>([])
+
+    useEffect(()=>{
+        //fetch counsellors
+        const getCounsellors=async()=>{
+            const res=await db.fetchAllCounsellors()
+            if (typeof res === "string"){
+                return window.alert(res)
+            }
+            setCounsellorsData(res)
         }
-    ]
+        getCounsellors();
+    },[])
 
 
     return <>
@@ -57,3 +55,5 @@ function ViewCounsellors(){
 }
 
 export default ViewCounsellors;
+
+

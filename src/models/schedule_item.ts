@@ -17,5 +17,17 @@ interface StoredScheduleItem{
     year:number
     is_cancelled:boolean
 }
+interface Counsellor{
+    name:string
+}
 
-export type {ScheduleItem,StoredScheduleItem}
+interface SetSchedules{
+    counsellors:Counsellor;
+    day:string;
+    date:number;
+    time:string;
+    month:string;
+    year:number
+    is_cancelled:boolean
+}
+export type {ScheduleItem,StoredScheduleItem,SetSchedules}

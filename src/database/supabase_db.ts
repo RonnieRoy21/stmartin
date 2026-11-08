@@ -56,6 +56,21 @@ class Database{
             return false
         }
     }
+    async getToken():Promise<boolean | string>{
+        try{
+            const {data,error}=await this.supabase.auth.getSession();
+            if (error ){
+                return false
+            }
+            if (data.session !== null){
+                const token:string=data.session.access_token
+                return token
+            }
+            return false
+        }catch(err){
+            return false
+        }
+    }
 
     //sign up
     async createAccount(details:Counsellor,passwd:string):Promise<string | boolean>{
@@ -218,5 +233,6 @@ class Database{
 }
 
 }
+
 
 export default Database;
