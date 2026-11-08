@@ -1,5 +1,5 @@
 import type { ScheduleItem, StoredScheduleItem } from '../models/schedule_item'
-import type { Counsellor, CounsellorProfUpdate, CounsellorSchedule } from '../models/counsellor_model'
+import type {  CounsellorProfUpdate, CounsellorSchedule } from '../models/counsellor_model'
 import { supabaseClient } from './supabaseConfig'
 import type { UserProfile } from '../models/profile_model'
 
@@ -73,7 +73,7 @@ class Database{
     }
 
     //sign up
-    async createAccount(details:Counsellor,passwd:string):Promise<string | boolean>{
+    async createAccount(details:{email:string,phone_number:string,name:string},passwd:string):Promise<string | boolean>{
         const {error}=await this.supabase.auth.signUp({email:details.email,password:passwd})
         
         if (error === null){

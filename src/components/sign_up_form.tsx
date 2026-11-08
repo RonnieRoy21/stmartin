@@ -44,10 +44,9 @@ function SignUpForm(){
         console.log("About to sign up...");
         
         const response=await db.createAccount({
-            id:null,
-            name:name,
-            phone_number:String(phoneNumber),
-            email:email
+            name: name,
+            phone_number: String(phoneNumber),
+            email: email,
         },password)
 
         
