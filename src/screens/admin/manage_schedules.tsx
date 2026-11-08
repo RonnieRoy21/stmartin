@@ -9,6 +9,7 @@ import type { SetSchedules } from "../../models/schedule_item";
 function ManageSchedules(){
 
     const db= new Database()
+    const adminUrl=import.meta.env.VITE_ADMIN_URL
     const [schedules,setSchedules]=useState<SetSchedules[] >([])
     const [isLoading,setIsLoading]=useState<boolean>(true)
 
@@ -21,7 +22,7 @@ function ManageSchedules(){
             return window.alert("Session may be expired, try to login again.")
         }
         setIsLoading(true)
-        const result=await axios.get("http://localhost:8000/admin/counsellors/schedules",{
+        const result=await axios.get(`${adminUrl}/admin/counsellors/schedules`,{
                 headers:{
                     "Content-Type":"application/json",
                     "Authorization":`Bearer ${token}`
