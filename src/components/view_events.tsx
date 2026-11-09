@@ -6,7 +6,6 @@ import {
   CircularProgress,
   List,
   ListItem,
-  ListItemAvatar,
   ListItemText,
   Stack,
   Typography,
