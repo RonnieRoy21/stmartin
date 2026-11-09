@@ -2,6 +2,7 @@ import type { ScheduleItem, StoredScheduleItem } from '../models/schedule_item'
 import type {  CounsellorProfUpdate, CounsellorSchedule } from '../models/counsellor_model'
 import { supabaseClient } from './supabaseConfig'
 import type { UserProfile } from '../models/profile_model'
+import type { EventItem } from '../models/event_model'
 
 
 
@@ -56,6 +57,23 @@ class Database{
             return false
         }
     }
+
+    
+    async getEvents():Promise<EventItem[] | string>{
+        try{
+            const {data,error}=await this.supabase.from("events").select("*").order('date',{ascending:true})
+            if (error){
+                return "Error getting events.Try again later."
+            }
+            var rows:EventItem[] = data
+            
+            return rows
+        }catch(err){
+            return "Something went wrong.Try again later."
+        }
+    }
+
+
     async getToken():Promise<boolean | string>{
         try{
             const {data,error}=await this.supabase.auth.getSession();

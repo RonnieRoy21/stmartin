@@ -1,14 +1,11 @@
 
 
 interface EventItem{
-    id:number | null
-    title:string
-    description:string
-    time:string
-    day:string
-    date:number
-    month:string
-    year:number
+    name:string;
+    description:string;
+    time:string;
+    date:string;
+    venue:string;
 }
 
 export type {EventItem}

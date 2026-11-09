@@ -1,12 +1,13 @@
+import  { Typography } from "@mui/material";
+import ViewEvents from "../../components/view_events";
 
 
 
 function EventsPage(){
 
     return<>
-    <p>
-        coming soon
-    </p>
+   <Typography>Planned Events</Typography>
+   <ViewEvents/>
     </>
 }
 
