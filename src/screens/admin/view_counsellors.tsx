@@ -34,7 +34,6 @@ function ViewCounsellors() {
       if (res.status !== 200) {
         return window.alert(res.statusText);
       }
-      console.log(res.data);
 
       setCounsellorsData(res.data);
     };
