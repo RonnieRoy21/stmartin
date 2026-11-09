@@ -25,7 +25,7 @@ function ViewCounsellors() {
       if (typeof token === "boolean") {
         return window.alert("Session is expired,try to login again");
       }
-      const res = await axios.get(`${adminUrl}/admin/counsellors/profiles`, {
+      const res = await axios.get(`${adminUrl}/counsellors/profiles`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
