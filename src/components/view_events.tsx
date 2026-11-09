@@ -51,7 +51,10 @@ function ViewEvents() {
               events.map((e, index) => {
                 return (
                   <ListItem>
-                    <Card key={index} sx={{ padding: "2%" }}>
+                    <Card
+                      key={index}
+                      sx={{ padding: "2%", backgroundColor: "tan" }}
+                    >
                       <Stack spacing={1}>
                         <Stack direction={"row"} spacing={2}>
                           <ListItemText sx={{ fontStyle: "oblique" }}>
@@ -63,7 +66,7 @@ function ViewEvents() {
                           <ListItemText> {e.time}</ListItemText>
                         </Stack>
                         <Stack spacing={2}>
-                          <ListItemText>Day/Month/Year :{e.date}</ListItemText>
+                          <ListItemText>Date: {e.date}</ListItemText>
                         </Stack>
                       </Stack>
                       <ListItemText> {e.description}</ListItemText>
