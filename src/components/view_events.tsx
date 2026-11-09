@@ -54,9 +54,13 @@ function ViewEvents() {
                     <Card key={index} sx={{ padding: "2%" }}>
                       <Stack spacing={1}>
                         <Stack direction={"row"} spacing={2}>
-                          <ListItemText>Name: {e.name}</ListItemText>
-                          <ListItemText>Date {e.venue}</ListItemText>
-                          <ListItemText>Time: {e.time}</ListItemText>
+                          <ListItemText sx={{ fontStyle: "oblique" }}>
+                            {e.name}
+                          </ListItemText>
+                          <ListItemText sx={{ fontStyle: "italic" }}>
+                            {e.venue}
+                          </ListItemText>
+                          <ListItemText> {e.time}</ListItemText>
                         </Stack>
                         <Stack spacing={2}>
                           <ListItemText>Day/Month/Year :{e.date}</ListItemText>
