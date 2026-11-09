@@ -44,31 +44,33 @@ function ViewEvents() {
           />
         </Stack>
       ) : (
-        <List sx={{ justifyContent: "center", alignContent: "center" }}>
-          {events.length === 0 ? (
-            <Typography>No Events Posted Yet</Typography>
-          ) : (
-            events.map((e) => {
-              return (
-                <ListItem>
-                  <Card sx={{ padding: "1%", minWidth: "60%" }}>
-                    <Stack direction={"row"} spacing={"10%"}>
-                      <Stack spacing={"10%"}>
-                        <ListItemText>{e.name}</ListItemText>
-                        <ListItemText>{e.venue}</ListItemText>
+        <Stack>
+          <List sx={{ justifyContent: "center", alignContent: "center" }}>
+            {events.length === 0 ? (
+              <Typography>No Events Posted Yet</Typography>
+            ) : (
+              events.map((e, index) => {
+                return (
+                  <ListItem>
+                    <Card key={index} sx={{ padding: "2%" }}>
+                      <Stack spacing={1}>
+                        <Stack direction={"row"} spacing={2}>
+                          <ListItemText>Name: {e.name}</ListItemText>
+                          <ListItemText>Date {e.venue}</ListItemText>
+                          <ListItemText>Time: {e.time}</ListItemText>
+                        </Stack>
+                        <Stack spacing={2}>
+                          <ListItemText>Day/Month/Year :{e.date}</ListItemText>
+                        </Stack>
                       </Stack>
-                      <Stack spacing={"10%"}>
-                        <ListItemAvatar>{e.time},</ListItemAvatar>
-                        <ListItemText>{e.date}</ListItemText>
-                      </Stack>
-                      <ListItemText>{e.description}</ListItemText>
-                    </Stack>
-                  </Card>
-                </ListItem>
-              );
-            })
-          )}
-        </List>
+                      <ListItemText> {e.description}</ListItemText>
+                    </Card>
+                  </ListItem>
+                );
+              })
+            )}
+          </List>
+        </Stack>
       )}
     </>
   );
