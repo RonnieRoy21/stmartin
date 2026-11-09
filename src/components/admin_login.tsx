@@ -18,7 +18,7 @@ function AdminLogin() {
   const [adminTotp, setAdminTotp] = useState<string>("");
   const [otpFieldEnabled, setOtpFieldEnabled] = useState<boolean>(false);
   const [attemptingLogin, setAttemptingLogin] = useState<boolean>(false);
-
+  const db = new Database();
   const handleAdminLogin = async () => {
     if (adminEmail.trim().length === 0) {
       return window.alert("Email is required");
@@ -26,8 +26,6 @@ function AdminLogin() {
     if (adminPassword.trim().length === 0) {
       return window.alert("Password is required");
     }
-
-    const db = new Database();
 
     const token = await db.adminSignIn(adminEmail, adminPassword);
 
@@ -55,12 +53,14 @@ function AdminLogin() {
   };
 
   const handleVerification = async (code: string) => {
+    const token = await db.getToken();
     const response = await axios.post(
       `${adminUrl}/verify-code/${code}`,
       {},
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       },
     );
