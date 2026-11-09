@@ -53,7 +53,11 @@ function ViewEvents() {
                   <ListItem>
                     <Card
                       key={index}
-                      sx={{ padding: "2%", backgroundColor: "tan" }}
+                      sx={{
+                        padding: "2%",
+                        backgroundColor: "tan",
+                        minWidth: "80%",
+                      }}
                     >
                       <Stack spacing={1}>
                         <Stack direction={"row"} spacing={2}>
