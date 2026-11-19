@@ -1,8 +1,16 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import Database from "../database/supabase_db";
 import SaintMartinLogo from "../assets/Saint_Martin_Logo-01-150x150.svg";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import Visibility from "@mui/icons-material/Visibility";
 
 const textFieldStyles = {
   marginLeft: "10%",
@@ -13,6 +21,7 @@ const textFieldStyles = {
 function LoginForm() {
   const [email, setEmail] = useState<string>("");
   const [passwd, setPasswd] = useState<string>("");
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const db = new Database();
@@ -65,8 +74,19 @@ function LoginForm() {
         />
         <TextField
           required
+          slotProps={{
+            input: {
+              endAdornment: (
+                <IconButton
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                >
+                  {passwordVisible ? <VisibilityOffIcon /> : <Visibility />}
+                </IconButton>
+              ),
+            },
+          }}
           id="passwordController"
-          type="password"
+          type={passwordVisible ? "text" : "password"}
           label="password"
           variant="outlined"
           value={passwd}

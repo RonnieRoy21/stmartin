@@ -1,13 +1,22 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import Database from "../database/supabase_db";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const textFieldStyles = {
   marginLeft: "15%",
   marginRight: "15%",
   marginBottom: "2%",
-  maxWidth: "60%",
+  maxWidth: "80%",
+  minWidth: "50%",
 };
 const db = new Database();
 function SignUpForm() {
@@ -18,6 +27,7 @@ function SignUpForm() {
   const [email, setEmail] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<number>(0);
   const [password, setPassword] = useState<string>("");
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   const handleSignUp = async () => {
     if (name.trim().length === 0) {
@@ -79,6 +89,7 @@ function SignUpForm() {
           variant="outlined"
           label="Your Full Name"
           onChange={(newText) => setName(newText.target.value)}
+          prefix="password"
           sx={textFieldStyles}
         />
         <TextField
@@ -102,13 +113,25 @@ function SignUpForm() {
         />
         <TextField
           required
+          slotProps={{
+            input: {
+              endAdornment: (
+                <IconButton
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                >
+                  {passwordVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              ),
+            },
+          }}
           id="passwordController"
-          type="password"
+          type={passwordVisible ? "text" : "password"}
           label="password"
           variant="outlined"
           onChange={(newPass) => setPassword(newPass.target.value)}
           sx={textFieldStyles}
         />
+
         <Button
           variant="outlined"
           sx={{

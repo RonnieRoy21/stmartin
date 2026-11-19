@@ -1,11 +1,9 @@
-
-
-interface EventItem{
-    name:string;
-    description:string;
-    time:string;
-    date:string;
-    venue:string;
+interface EventItem {
+  name: string;
+  description: string;
+  time: string;
+  date: string;
+  venue: string;
 }
 
-export type {EventItem}
+export type { EventItem };

@@ -196,14 +196,17 @@ class Database {
   }
 
   //cancel a schedule
-  async cancelSchedule(scheduleId: number): Promise<string | boolean> {
+  async cancelSchedule(
+    scheduleId: number,
+    reason: string,
+  ): Promise<string | boolean> {
     const id = await this.getUserId();
     if (id === null || id === undefined) {
       return "Unauthenticated.Try to login first";
     }
     const { error } = await this.supabase
       .from("schedules")
-      .update({ is_cancelled: true })
+      .update({ is_cancelled: true, cancel_reason: reason })
       .eq("id", scheduleId)
       .eq("counsellor_id", id);
     if (error !== null) {
