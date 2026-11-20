@@ -30,5 +30,6 @@ interface SetSchedules {
   month: string;
   year: number;
   is_cancelled: boolean;
+  cancel_reason: string;
 }
 export type { ScheduleItem, StoredScheduleItem, SetSchedules };

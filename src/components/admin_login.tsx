@@ -12,7 +12,7 @@ import axios from "axios";
 
 function AdminLogin() {
   const navigate = useNavigate();
-  const adminUrl = import.meta.env.VITE_ADMIN_URL;
+  const adminUrl = "http://localhost:8000/admin";
   const [adminEmail, setAdminEmail] = useState<string>("");
   const [adminPassword, setAdminPassword] = useState<string>("");
   const [adminTotp, setAdminTotp] = useState<string>("");

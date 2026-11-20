@@ -1,7 +1,7 @@
 import type { ScheduleItem, StoredScheduleItem } from "../models/schedule_item";
 import type {
   CounsellorProfUpdate,
-  CounsellorSchedule,
+  // CounsellorSchedule,
 } from "../models/counsellor_model";
 import { supabaseClient } from "./supabaseConfig";
 import type { UserProfile } from "../models/profile_model";
@@ -134,29 +134,29 @@ class Database {
     return true;
   }
 
-  //admin fetch all schedules
-  async adminGetAllSchedules(): Promise<string | CounsellorSchedule[]> {
-    this.userId = await this.getUserId();
-    const { data, error } = await this.supabase
-      .from("counsellors")
-      .select("*")
-      .eq("id", this.userId);
-    if (error) {
-      return error.message;
-    }
+  // //admin fetch all schedules
+  // async adminGetAllSchedules(): Promise<string | CounsellorSchedule[]> {
+  //   this.userId = await this.getUserId();
+  //   const { data, error } = await this.supabase
+  //     .from("counsellors")
+  //     .select("*")
+  //     .eq("id", this.userId);
+  //   if (error) {
+  //     return error.message;
+  //   }
 
-    if (data[0]["role"] === "admin") {
-      const { data, error } = await this.supabase.from("schedules")
-        .select(`counsellor_id,time,date,day,month,year,counsellors(
-                    id,name)`);
-      if (error) {
-        return "Schedules not fetched.";
-      }
-      const rows: CounsellorSchedule[] = data;
-      return rows;
-    }
-    return "Unauthorized Access.";
-  }
+  //   if (data[0]["role"] === "admin") {
+  //     const { data, error } = await this.supabase.from("schedules")
+  //       .select(`counsellor_id,time,date,day,month,year,counsellors(
+  //                   id,name)`);
+  //     if (error) {
+  //       return "Schedules not fetched.";
+  //     }
+  //     const rows: CounsellorSchedule[] = data;
+  //     return rows;
+  //   }
+  //   return "Unauthorized Access.";
+  // }
 
   //fetch schedules
   async getSchedules(): Promise<StoredScheduleItem[] | string> {

@@ -14,7 +14,7 @@ import type { SetSchedules } from "../../models/schedule_item";
 
 function ManageSchedules() {
   const db = new Database();
-  const adminUrl = import.meta.env.VITE_ADMIN_URL;
+  const adminUrl = "http://localhost:8000/admin";
   const [schedules, setSchedules] = useState<SetSchedules[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -77,7 +77,9 @@ function ManageSchedules() {
                           </ListItemText>
                         </Stack>
                       </Stack>
-                      <ListItemText></ListItemText>
+                      {s.is_cancelled && (
+                        <ListItemText>Reason : {s.cancel_reason}</ListItemText>
+                      )}
                     </Card>
                   </ListItem>
                 </>
