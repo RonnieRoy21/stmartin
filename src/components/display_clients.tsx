@@ -38,7 +38,7 @@ function DisplayClients() {
             <List>
                 {uploadedClients.map((c) => {
                     return (
-                        <Paper elevation={3}>
+                        <Paper elevation={3} sx={{ marginBottom: '2%' }}>
                             <ListItem>
                                 <Stack sx={{ width: '100%' }}>
                                     <Stack direction={'row'} spacing={'1%'}>
