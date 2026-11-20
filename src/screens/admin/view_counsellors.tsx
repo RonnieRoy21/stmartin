@@ -48,8 +48,9 @@ function ViewCounsellors() {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>EMAIL</TableCell>
+                                <TableCell>NO.</TableCell>
                                 <TableCell>NAME</TableCell>
+                                <TableCell>EMAIL</TableCell>
                                 <TableCell>PHONE NUMBER</TableCell>
                                 <TableCell>REGISTERED AS</TableCell>
                             </TableRow>
@@ -59,8 +60,9 @@ function ViewCounsellors() {
                                 return (
                                     <>
                                         <TableRow key={index}>
-                                            <TableCell>{d.email}</TableCell>
+                                            <TableCell>{index + 1}</TableCell>
                                             <TableCell>{d.name}</TableCell>
+                                            <TableCell>{d.email}</TableCell>
                                             <TableCell>
                                                 {'0' + d.phone_number}
                                             </TableCell>
