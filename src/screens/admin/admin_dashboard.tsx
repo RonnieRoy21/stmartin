@@ -1,66 +1,77 @@
-import { Stack, Button } from "@mui/material";
-import { useState } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { BottomNavigation, BottomNavigationAction } from '@mui/material';
+import { useState } from 'react';
+import { Outlet, useNavigate } from 'react-router';
 
 function AdminDashboard() {
-  const navigate = useNavigate();
-  const [activeId, setActiveId] = useState<string>("");
+    const navigate = useNavigate();
+    const [activeId, setActiveId] = useState<string>('');
 
-  const handleNavigation = (id: string, path: string) => {
-    setActiveId(id);
-    navigate(path);
-  };
-  return (
-    <>
-      <Stack
-        direction={"row"}
-        spacing={1}
-        sx={{
-          justifyContent: "center",
-          paddingTop: "2%",
-          paddingLeft: "2%",
-          Paddingright: "2%",
-        }}
-      >
-        <Button
-          id="counsellorsBtn"
-          variant="outlined"
-          onClick={() => handleNavigation("counsellorsBtn", "")}
-          sx={{
-            backgroundColor:
-              activeId === "counsellorsBtn" ? "orange" : "whitesmoke",
-          }}
-        >
-          {" "}
-          Counsellors
-        </Button>
-
-        <Button
-          id="schedulesBtn"
-          variant="outlined"
-          sx={{
-            backgroundColor:
-              activeId === "schedulesBtn" ? "orange" : "whitesmoke",
-          }}
-          onClick={() => handleNavigation("schedulesBtn", "manage_schedules")}
-        >
-          Schedules
-        </Button>
-
-        <Button
-          id="eventsBtn"
-          variant="outlined"
-          onClick={() => handleNavigation("eventsBtn", "manage_events")}
-          sx={{
-            backgroundColor: activeId === "eventsBtn" ? "orange" : "whitesmoke",
-          }}
-        >
-          Events
-        </Button>
-      </Stack>
-      <Outlet />
-    </>
-  );
+    const handleNavigation = (id: string, path: string) => {
+        setActiveId(id);
+        navigate(path);
+    };
+    return (
+        <>
+            <Outlet />
+            <BottomNavigation
+                showLabels
+                sx={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    justifyContent: 'space-evenly',
+                }}
+            >
+                <BottomNavigationAction
+                    id="counsellorsBtn"
+                    label="Counsellors"
+                    sx={{
+                        backgroundColor:
+                            activeId === 'counsellorsBtn'
+                                ? 'orange'
+                                : 'whitesmoke',
+                    }}
+                    onClick={() => handleNavigation('counsellorsBtn', '')}
+                />
+                <BottomNavigationAction
+                    id="schedulesBtn"
+                    label="Schedules"
+                    onClick={() =>
+                        handleNavigation('schedulesBtn', 'manage_schedules')
+                    }
+                    sx={{
+                        backgroundColor:
+                            activeId === 'schedulesBtn'
+                                ? 'orange'
+                                : 'whitesmoke',
+                    }}
+                />
+                <BottomNavigationAction
+                    id="eventsBtn"
+                    label="Events"
+                    onClick={() =>
+                        handleNavigation('eventsBtn', 'manage_events')
+                    }
+                    sx={{
+                        backgroundColor:
+                            activeId === 'eventsBtn' ? 'orange' : 'whitesmoke',
+                    }}
+                />
+                <BottomNavigationAction
+                    id="clientsBtn"
+                    label="Clients"
+                    onClick={() =>
+                        handleNavigation('clientsBtn', 'manage_clients')
+                    }
+                    sx={{
+                        backgroundColor:
+                            activeId === 'eventsBtn' ? 'orange' : 'whitesmoke',
+                    }}
+                />
+            </BottomNavigation>
+        </>
+    );
 }
 
 export default AdminDashboard;
