@@ -4,7 +4,7 @@ import { Outlet, useNavigate } from 'react-router';
 
 function AdminDashboard() {
     const navigate = useNavigate();
-    const [activeId, setActiveId] = useState<string>('counsellorsBtn');
+    const [activeId, setActiveId] = useState<string>('');
 
     const handleNavigation = (id: string, path: string) => {
         setActiveId(id);

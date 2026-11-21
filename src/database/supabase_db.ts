@@ -1,8 +1,5 @@
 import type { ScheduleItem, StoredScheduleItem } from '../models/schedule_item';
-import type {
-    CounsellorProfUpdate,
-    // CounsellorSchedule,
-} from '../models/counsellor_model';
+import type { CounsellorProfUpdate } from '../models/counsellor_model';
 import { supabaseClient } from './supabaseConfig';
 import type { UserProfile } from '../models/profile_model';
 import type { EventItem } from '../models/event_model';
@@ -136,30 +133,6 @@ class Database {
         return true;
     }
 
-    // //admin fetch all schedules
-    // async adminGetAllSchedules(): Promise<string | CounsellorSchedule[]> {
-    //   this.userId = await this.getUserId();
-    //   const { data, error } = await this.supabase
-    //     .from("counsellors")
-    //     .select("*")
-    //     .eq("id", this.userId);
-    //   if (error) {
-    //     return error.message;
-    //   }
-
-    //   if (data[0]["role"] === "admin") {
-    //     const { data, error } = await this.supabase.from("schedules")
-    //       .select(`counsellor_id,time,date,day,month,year,counsellors(
-    //                   id,name)`);
-    //     if (error) {
-    //       return "Schedules not fetched.";
-    //     }
-    //     const rows: CounsellorSchedule[] = data;
-    //     return rows;
-    //   }
-    //   return "Unauthorized Access.";
-    // }
-
     //fetch schedules
     async getSchedules(): Promise<StoredScheduleItem[] | string> {
         await this.getUserId();
@@ -284,6 +257,41 @@ class Database {
             return true;
         }
         return 'Could not update your profile';
+    }
+
+    async counsellorViewClients() {
+        try {
+            this.userId = await this.getUserId();
+            const { data, error } = await this.supabase
+                .from('clients')
+                .select(
+                    `id,name,age,gender,occupation,presenting_issue,counsellors(name,phone_number)`
+                )
+                .or(
+                    `assigned_counsellor_id.eq.${this.userId},assigned_counsellor_id.is.null`
+                );
+            if (error) {
+                return 'Failed to retrieve clients';
+            }
+            return data;
+        } catch (err) {
+            return String(err);
+        }
+    }
+    async assignCounsellor(clientId: string) {
+        try {
+            const id = await this.getUserId();
+            const { error } = await this.supabase
+                .from('clients')
+                .update({ assigned_counsellor_id: id })
+                .eq('id', clientId);
+            if (error) {
+                return 'Could not assign you to the client';
+            }
+            return 'Congratulations,you have been assigned a new client';
+        } catch (err) {
+            return String(err);
+        }
     }
 }
 

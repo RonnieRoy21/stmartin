@@ -15,6 +15,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 function AdminLogin() {
     const navigate = useNavigate();
     const adminUrl = import.meta.env.VITE_ADMIN_URL;
+
     const [adminEmail, setAdminEmail] = useState<string>('');
     const [adminPassword, setAdminPassword] = useState<string>('');
     const [adminTotp, setAdminTotp] = useState<string>('');

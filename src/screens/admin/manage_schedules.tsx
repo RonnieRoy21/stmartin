@@ -75,7 +75,6 @@ function ManageSchedules() {
                 <Stack
                     direction={'row'}
                     sx={{
-                        // alignContent: 'space-evenly',
                         justifyContent: 'space-around',
                     }}
                 >
