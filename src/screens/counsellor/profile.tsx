@@ -29,7 +29,7 @@ function ProfilePage() {
             setProfile(res);
         };
         getProfile();
-    });
+    }, []);
 
     return (
         <>
