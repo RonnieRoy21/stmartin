@@ -19,17 +19,21 @@ function ProfilePage() {
         navigate('update', { state: profile });
     };
 
+    const getProfile = async () => {
+        const res = await db.fetchCounsellorById();
+        if (typeof res === 'string') {
+            return window.alert(res);
+        }
+        setProfile(res);
+    };
     //fetch profile
     useEffect(() => {
-        const getProfile = async () => {
-            const res = await db.fetchCounsellorById();
-            if (typeof res === 'string') {
-                return window.alert(res);
-            }
-            setProfile(res);
-        };
         getProfile();
     }, []);
+
+    useEffect(() => {
+        handleViewProfile();
+    }, [profile]);
 
     return (
         <>
