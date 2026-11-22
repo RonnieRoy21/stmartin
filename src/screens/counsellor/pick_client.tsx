@@ -1,5 +1,6 @@
 import {
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -22,6 +23,7 @@ function PickClient() {
     const [confirmClientSelection, setConfirmClientSelection] =
         useState<boolean>(false);
     const [selectedFilter, setSelectedFilter] = useState<string>('all clients');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleAssign = async (id: string) => {
         const response = await db.assignCounsellor(id);
@@ -30,6 +32,7 @@ function PickClient() {
     };
     //fetch clients method
     const fetchClients = async () => {
+        setIsLoading(true);
         const clients = await db.counsellorViewClients();
         if (typeof clients === 'string') {
             return window.alert(clients);
@@ -51,15 +54,17 @@ function PickClient() {
                       },
         }));
         setAvailableClients(formattedClients);
+        setIsLoading(false);
     };
 
     //useeffect method
     useEffect(() => {
         fetchClients();
-        console.log(availableClients);
     }, []);
 
-    return (
+    return isLoading ? (
+        <CircularProgress sx={{ alignSelf: 'center' }} />
+    ) : (
         <>
             <Stack
                 direction={'row'}

@@ -18,10 +18,10 @@ function ViewProfile() {
                             {profile.profile_photo_url ? (
                                 <Avatar
                                     variant="circular"
-                                    style={{
+                                    sx={{
                                         alignSelf: 'center',
-                                        width: '40%',
-                                        height: 150,
+                                        width: '200px',
+                                        height: '200px',
                                     }}
                                     src={profile.profile_photo_url}
                                 />

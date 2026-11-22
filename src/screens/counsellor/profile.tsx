@@ -1,4 +1,4 @@
-import { Button, Stack } from '@mui/material';
+import { Button, CircularProgress, Stack } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import Database from '../../database/supabase_db';
@@ -7,6 +7,7 @@ import type { UserProfile } from '../../models/profile_model';
 function ProfilePage() {
     const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const db = new Database();
 
     const handleViewProfile = () => {
@@ -20,11 +21,13 @@ function ProfilePage() {
     };
 
     const getProfile = async () => {
+        setIsLoading(true);
         const res = await db.fetchCounsellorById();
         if (typeof res === 'string') {
             return window.alert(res);
         }
         setProfile(res);
+        setIsLoading(false);
     };
     //fetch profile
     useEffect(() => {
@@ -35,7 +38,9 @@ function ProfilePage() {
         handleViewProfile();
     }, [profile]);
 
-    return (
+    return isLoading ? (
+        <CircularProgress sx={{ alignSelf: 'center' }} />
+    ) : (
         <>
             <Stack spacing={1} sx={{ paddingTop: '1%' }}>
                 <Stack
