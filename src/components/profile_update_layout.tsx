@@ -36,9 +36,7 @@ function UpdateProfile() {
     return (
         <>
             <Stack spacing={2} sx={{ padding: '2%' }}>
-                <Typography>
-                    Update your name or your phone number or both
-                </Typography>
+                <Typography>Update one or more details</Typography>
                 <TextField
                     required
                     helperText="New Name"
