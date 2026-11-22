@@ -23,7 +23,7 @@ function UpdateProfile() {
     const handleUpdate = async () => {
         //check if both number and name are filled
         if (!newName || !newPhone) {
-            return window.alert("NAme and Phone Number can't be empty");
+            return window.alert("Name and Phone Number can't be empty");
         }
         const response = await db.updateCounsellorProfile({
             name: newName,
