@@ -1,4 +1,4 @@
-import { ListItem, ListItemText, Stack, Typography } from '@mui/material';
+import { ListItem, ListItemText, Stack } from '@mui/material';
 import type { ClientModel } from '../models/client_model';
 
 interface ClientProps {
@@ -26,17 +26,6 @@ function DisplayClients({ client }: ClientProps) {
                         <ListItemText>
                             Issue: {client.presenting_issue}
                         </ListItemText>
-                    </Stack>
-                    <Stack direction={'row'}>
-                        {/**counsellor name and number if present */}
-
-                        {client.counsellors === undefined ||
-                        client.counsellors === null ||
-                        client.counsellors.length === 0 ? (
-                            <Typography>Not Assigned </Typography>
-                        ) : (
-                            <Typography>Assigned</Typography>
-                        )}
                     </Stack>
                 </Stack>
             </ListItem>

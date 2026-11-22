@@ -1,82 +1,70 @@
-import { Stack, TextField, Button, Typography } from "@mui/material";
-import { useState } from "react";
-import Database from "../database/supabase_db";
+import { Stack, TextField, Button, Typography } from '@mui/material';
+import { useState, type ChangeEvent } from 'react';
+import Database from '../database/supabase_db';
+import { useLocation } from 'react-router';
+import type { UserProfile } from '../models/profile_model';
 
 function UpdateProfile() {
-  const db = new Database();
-  const [newName, setNewName] = useState<string>("");
-  const [newPhone, setNewPhone] = useState<number>(0);
+    const db = new Database();
+    const location = useLocation();
+    const profile: UserProfile = location.state;
+    const [newName, setNewName] = useState<string>(profile.name);
+    const [newPhone, setNewPhone] = useState<number>(
+        Number(profile.phone_number)
+    );
+    const [newPhoto, setNewPhoto] = useState<File | null>(null);
 
-  const handleUpdate = async () => {
-    //check if both number and name are filled
-    if (
-      newName !== null &&
-      newName.length > 0 &&
-      newPhone.toString().trim().length >= 9
-    ) {
-      const res = await db.updateCounsellorProfile({
-        name: newName,
-        phone_number: newPhone.toString(),
-      });
-      if (res === true) {
-        return window.alert("Name and Number updated");
-      }
-      return window.alert(res);
-    }
+    const handleUploadProfile = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files;
+        if (file !== null && file.length > 0) {
+            setNewPhoto(file[0]);
+        }
+    };
+    const handleUpdate = async () => {
+        //check if both number and name are filled
+        if (!newName || !newPhone) {
+            return window.alert("NAme and Phone Number can't be empty");
+        }
+        const response = await db.updateCounsellorProfile({
+            name: newName,
+            phone_number: String(newPhone),
+            photo: newPhoto,
+        });
+        return window.alert(response);
+    };
 
-    //check if number is filled
-    if (newPhone.toString().trim().length >= 9) {
-      const res = await db.updateCounsellorProfile({
-        name: null,
-        phone_number: newPhone.toString(),
-      });
-      if (res === true) {
-        return window.alert("Number updated");
-      }
-      return window.alert(res);
-    }
+    return (
+        <>
+            <Stack spacing={2} sx={{ padding: '2%' }}>
+                <Typography>
+                    Update your name or your phone number or both
+                </Typography>
+                <TextField
+                    required
+                    helperText="New Name"
+                    type="text"
+                    value={newName}
+                    onChange={(v) => setNewName(v.target.value)}
+                />
+                <TextField
+                    required
+                    type="number"
+                    helperText="New Phone Number"
+                    value={newPhone}
+                    onChange={(v) => setNewPhone(Number(v.target.value))}
+                />
+                <TextField
+                    type="file"
+                    helperText="Select profile photo"
+                    onChange={handleUploadProfile}
+                />
 
-    // check if name is filled
-    if (newName !== null && newName.length > 0) {
-      const res = await db.updateCounsellorProfile({
-        name: newName,
-        phone_number: null,
-      });
-      if (res === true) {
-        return window.alert("Name updated");
-      }
-      return window.alert(res);
-    }
-
-    //return error
-    return window.alert("Please enter either a name or number to update");
-  };
-
-  return (
-    <>
-      <Stack spacing={2} sx={{ padding: "2%" }}>
-        <Typography>Update your name or your phone number or both</Typography>
-        <TextField
-          required
-          helperText="New Name"
-          type="text"
-          value={newName}
-          onChange={(v) => setNewName(v.target.value)}
-        />
-        <TextField
-          required
-          type="number"
-          helperText="New Phone Number"
-          value={newPhone}
-          onChange={(v) => setNewPhone(Number(v.target.value))}
-        />
-
-        <Stack direction={"row"}>
-          <Button onClick={handleUpdate}>Update</Button>
-        </Stack>
-      </Stack>
-    </>
-  );
+                <Stack direction={'row'}>
+                    <Button onClick={handleUpdate}>Update</Button>
+                </Stack>
+            </Stack>
+        </>
+    );
 }
 
 export default UpdateProfile;

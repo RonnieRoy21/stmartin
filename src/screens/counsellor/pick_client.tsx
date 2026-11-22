@@ -21,6 +21,7 @@ function PickClient() {
     const [availableClients, setAvailableClients] = useState<ClientModel[]>([]);
     const [confirmClientSelection, setConfirmClientSelection] =
         useState<boolean>(false);
+    const [selectedFilter, setSelectedFilter] = useState<string>('all clients');
 
     const handleAssign = async (id: string) => {
         const response = await db.assignCounsellor(id);
@@ -33,8 +34,23 @@ function PickClient() {
         if (typeof clients === 'string') {
             return window.alert(clients);
         }
-
-        setAvailableClients(clients);
+        const formattedClients: ClientModel[] = clients.map((client) => ({
+            id: String(client.id),
+            name: String(client.name),
+            age: Number(client.age),
+            gender: String(client.gender),
+            occupation: String(client.occupation),
+            presenting_issue: String(client.presenting_issue),
+            counsellors:
+                client.counsellors === null ||
+                typeof client.counsellors === 'undefined'
+                    ? null
+                    : {
+                          name: client.counsellors[0]?.name,
+                          phone_number: client.counsellors[0]?.phone_number,
+                      },
+        }));
+        setAvailableClients(formattedClients);
     };
 
     //useeffect method
@@ -56,14 +72,26 @@ function PickClient() {
                 }}
             >
                 <Typography>Filters</Typography>
-                <Select label="Filter" sx={{ width: '70%' }}>
-                    <MenuItem>View All</MenuItem>
-                    <MenuItem>My Clients</MenuItem>
+                <Select
+                    label="Filter"
+                    sx={{ width: '70%' }}
+                    value={selectedFilter}
+                    onChange={(e) => setSelectedFilter(e.target.value)}
+                >
+                    <MenuItem value="all clients">all clients</MenuItem>
+                    <MenuItem value="my clients">my clients</MenuItem>
                 </Select>
             </Stack>
             <List>
                 {availableClients.length > 0 ? (
-                    availableClients.map((c, index) => {
+                    (selectedFilter === 'my clients'
+                        ? availableClients.filter(
+                              (c) =>
+                                  c.counsellors !== null &&
+                                  typeof c.counsellors !== 'undefined'
+                          )
+                        : availableClients
+                    ).map((c, index) => {
                         return (
                             <Paper
                                 key={index}
@@ -73,18 +101,18 @@ function PickClient() {
                                 <DisplayClients client={c} />
                                 <Stack direction={'row-reverse'}>
                                     {/**buttons to modify client data  */}
-                                    <Button
-                                        disabled={
-                                            c.counsellors !== null &&
-                                            c.counsellors !== undefined
-                                        }
-                                        variant="contained"
-                                        onClick={() =>
-                                            setConfirmClientSelection(true)
-                                        }
-                                    >
-                                        Select
-                                    </Button>
+                                    {c.counsellors !== null ? (
+                                        <Typography>Your client</Typography>
+                                    ) : (
+                                        <Button
+                                            variant="contained"
+                                            onClick={() =>
+                                                setConfirmClientSelection(true)
+                                            }
+                                        >
+                                            Select
+                                        </Button>
+                                    )}
                                     <Dialog
                                         open={confirmClientSelection}
                                         onClose={() =>

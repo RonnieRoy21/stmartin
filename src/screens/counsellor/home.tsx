@@ -70,16 +70,14 @@ function HomePage() {
                     <Stack spacing={2}>
                         {cards.map((card, index) => {
                             return (
-                                <>
-                                    <CreateCard
-                                        key={index.toString()}
-                                        id={card.id}
-                                        header={card.title}
-                                        content={card.content}
-                                        actionTitle={card.actionTitle}
-                                        actions={() => navigate(card.id)}
-                                    />
-                                </>
+                                <CreateCard
+                                    cardKey={index}
+                                    id={card.id}
+                                    header={card.title}
+                                    content={card.content}
+                                    actionTitle={card.actionTitle}
+                                    actions={() => navigate(card.id)}
+                                />
                             );
                         })}
                     </Stack>

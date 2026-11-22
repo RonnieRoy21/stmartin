@@ -182,12 +182,20 @@ function ManageClients() {
                 </DialogActions>
             </Dialog>{' '}
             {uploadedClients.length > 0 ? (
-                <List>
+                <List sx={{ marginBottom: '10%' }}>
                     {uploadedClients.map((c, index) => {
                         return (
                             <>
                                 <Paper elevation={3} sx={{ margin: '2%' }}>
                                     <DisplayClients key={index} client={c} />
+                                    {c.counsellors ? (
+                                        <Typography>
+                                            Assigned To: {c.counsellors.name},
+                                            {'0' + c.counsellors.phone_number}
+                                        </Typography>
+                                    ) : (
+                                        <Typography>Not Assigned</Typography>
+                                    )}
                                     <Stack
                                         direction={'row-reverse'}
                                         spacing={'8%'}
@@ -212,5 +220,3 @@ function ManageClients() {
 }
 
 export default ManageClients;
-
-//1948010

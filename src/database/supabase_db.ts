@@ -211,17 +211,42 @@ class Database {
     //update profile
     async updateCounsellorProfile(
         details: CounsellorProfUpdate
-    ): Promise<string | boolean> {
+    ): Promise<string> {
         this.userId = await this.getUserId();
         if (this.userId === null || this.userId === undefined) {
             return 'Unauthenticated.Try to login first';
         }
-        if (
-            details.name !== null &&
-            details.name.length > 0 &&
-            details.phone_number !== null &&
-            details.phone_number?.length >= 9
-        ) {
+        if (details.photo !== null) {
+            //update with photo
+            var publicUrl: string = '';
+            const { data, error } = await this.supabase.storage
+                .from('profile_photos')
+                .upload(`${this.userId}/${details.photo.name}`, details.photo, {
+                    upsert: true,
+                });
+            if (error) {
+                return 'unable to upload profile photo';
+            }
+
+            const response = this.supabase.storage
+                .from('profile_photos')
+                .getPublicUrl(data.path);
+
+            publicUrl = response.data.publicUrl;
+            const res = await this.supabase
+                .from('counsellors')
+                .update({
+                    name: details.name,
+                    phone_number: details.phone_number,
+                    profile_photo_url: publicUrl,
+                })
+                .eq('id', this.userId);
+            if (res.error) {
+                return 'Unable to update profile';
+            }
+            return 'Profile updated';
+        } else {
+            //update without photo
             const { error } = await this.supabase
                 .from('counsellors')
                 .update({
@@ -230,33 +255,13 @@ class Database {
                 })
                 .eq('id', this.userId);
             if (error) {
-                return 'Could not update name an phone number';
+                console.log(error);
+
+                return 'Profile not Updated.Server Error';
             }
-            return true;
-        } else if (details.name !== null && details.name.length > 0) {
-            const { error } = await this.supabase
-                .from('counsellors')
-                .update({
-                    name: details.name,
-                })
-                .eq('id', this.userId);
-            if (error) {
-                return `Could not update name.`;
-            }
-            return true;
-        } else if (details.phone_number?.length !== null) {
-            const { error } = await this.supabase
-                .from('counsellors')
-                .update({
-                    phone_number: details.phone_number,
-                })
-                .eq('id', this.userId);
-            if (error !== null) {
-                return 'Could not update phone number';
-            }
-            return true;
+
+            return 'Profile updated';
         }
-        return 'Could not update your profile';
     }
 
     async counsellorViewClients() {

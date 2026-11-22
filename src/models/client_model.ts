@@ -10,7 +10,7 @@ interface ClientModel {
     gender: string;
     occupation: string;
     presenting_issue: string;
-    counsellors: AssignedCounsellor[] | null;
+    counsellors: AssignedCounsellor | null;
 }
 
 export type { ClientModel };
