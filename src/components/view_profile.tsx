@@ -14,19 +14,17 @@ function ViewProfile() {
                     <Typography>Loading Profile....</Typography>
                 ) : (
                     <Card sx={{ marginTop: '1%', color: 'orange' }}>
-                        <Stack direction={'row'}>
+                        <Stack>
                             {profile.profile_photo_url ? (
                                 <Avatar
-                                    variant="rounded"
-                                    sx={{
+                                    variant="circular"
+                                    style={{
                                         alignSelf: 'center',
-                                        width: '15%',
-                                        height: '40%',
-                                        padding: '2%',
-                                        margin: '2%',
+                                        width: '40%',
+                                        height: 150,
                                     }}
                                     src={profile.profile_photo_url}
-                                ></Avatar>
+                                />
                             ) : (
                                 <ImageNotSupported />
                             )}

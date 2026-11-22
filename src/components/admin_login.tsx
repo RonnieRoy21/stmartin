@@ -168,6 +168,7 @@ function AdminLogin() {
                     >
                         Verify Code
                     </Button>
+
                     <Button onClick={() => navigate('/')}>Back</Button>
                 </Stack>
             </Stack>
