@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 
 interface cardItem {
-    cardKey: number;
     id: string;
     header: string;
     content: string;
@@ -19,7 +18,7 @@ interface cardItem {
 function CreateCard(c_content: cardItem) {
     return (
         <>
-            <Card key={c_content.cardKey} sx={{ backgroundColor: 'tan' }}>
+            <Card sx={{ backgroundColor: 'tan' }}>
                 <Stack>
                     <Typography
                         sx={{ color: 'brown', fontStyle: 'oblique' }}

@@ -16,6 +16,7 @@ import DisplayClients from '../../components/display_clients';
 import Database from '../../database/supabase_db';
 import type { ClientModel } from '../../models/client_model';
 import { useEffect, useState } from 'react';
+import ShowSnackBar from '../../components/snackbar';
 function PickClient() {
     //state variables
     const db = new Database();
@@ -24,20 +25,24 @@ function PickClient() {
         useState<boolean>(false);
     const [selectedFilter, setSelectedFilter] = useState<string>('all clients');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [msg, setMsg] = useState<string>('');
+    const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
 
-    const handleAssign = async (id: string) => {
-        const response = await db.assignCounsellor(id);
+    //assign counsellors to client
+    const handleAssign = async (client: ClientModel) => {
+        const response = await db.assignCounsellor(client);
         setConfirmClientSelection(false);
-        return window.alert(response);
+        return setMsg(response);
     };
+
     //fetch clients method
     const fetchClients = async () => {
         setIsLoading(true);
-        const clients = await db.counsellorViewClients();
-        if (typeof clients === 'string') {
-            return window.alert(clients);
+        const response = await db.counsellorViewClients();
+        if (typeof response === 'string') {
+            return setMsg(response);
         }
-        const formattedClients: ClientModel[] = clients.map((client) => ({
+        const formattedClients: ClientModel[] = response.map((client) => ({
             id: String(client.id),
             name: String(client.name),
             age: Number(client.age),
@@ -61,6 +66,12 @@ function PickClient() {
     useEffect(() => {
         fetchClients();
     }, []);
+
+    useEffect(() => {
+        if (msg) {
+            setShowSnackBar(true);
+        }
+    }, [msg]);
 
     return isLoading ? (
         <CircularProgress sx={{ alignSelf: 'center' }} />
@@ -91,9 +102,9 @@ function PickClient() {
                 {availableClients.length > 0 ? (
                     (selectedFilter === 'my clients'
                         ? availableClients.filter(
-                              (c) =>
-                                  c.counsellors !== null &&
-                                  typeof c.counsellors !== 'undefined'
+                              (d) =>
+                                  d.counsellors !== null &&
+                                  typeof d.counsellors !== 'undefined'
                           )
                         : availableClients
                     ).map((c, index) => {
@@ -137,9 +148,11 @@ function PickClient() {
                                             >
                                                 <Button
                                                     variant="contained"
-                                                    onClick={() =>
-                                                        handleAssign(c.id)
-                                                    }
+                                                    onClick={() => {
+                                                        console.log(c);
+
+                                                        handleAssign(c);
+                                                    }}
                                                 >
                                                     Confirm
                                                 </Button>
@@ -161,12 +174,17 @@ function PickClient() {
                         );
                     })
                 ) : (
-                    <Typography>
-                        {' '}
-                        You have no clients assigned and none to select from
-                    </Typography>
+                    <Typography> No Clients Found</Typography>
                 )}
             </List>
+            <ShowSnackBar
+                open={showSnackBar}
+                message={msg}
+                close={() => {
+                    setShowSnackBar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

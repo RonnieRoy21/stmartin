@@ -1,4 +1,11 @@
-import { Avatar, Card, CardContent, Stack, Typography } from '@mui/material';
+import {
+    Avatar,
+    Card,
+    CardContent,
+    CircularProgress,
+    Stack,
+    Typography,
+} from '@mui/material';
 import { useLocation } from 'react-router';
 import type { UserProfile } from '../models/profile_model';
 import { ImageNotSupported } from '@mui/icons-material';
@@ -11,7 +18,10 @@ function ViewProfile() {
         <>
             <Stack spacing={2} sx={{ padding: '2%' }}>
                 {profile === null ? (
-                    <Typography>Loading Profile....</Typography>
+                    <>
+                        <CircularProgress sx={{ alignSelf: 'center' }} />
+                        <Typography>Loading Profile....</Typography>
+                    </>
                 ) : (
                     <Card sx={{ marginTop: '1%', color: 'orange' }}>
                         <Stack>

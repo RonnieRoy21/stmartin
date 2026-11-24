@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router';
-import SignUpForm from '../src/components/sign_up_form';
+import SignUpForm from './screens/counsellor/sign_up_form';
 import LoginForm from './components/login_form';
 import MainScreen from './screens/counsellor/main_screen';
 import EventsPage from './screens/counsellor/events';

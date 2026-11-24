@@ -21,16 +21,16 @@ function AdminDashboard() {
                     left: 0,
                     right: 0,
                     justifyContent: 'space-evenly',
+                    backgroundColor: 'bisque',
                 }}
             >
                 <BottomNavigationAction
                     id="counsellorsBtn"
                     label="Counsellors"
                     sx={{
+                        color: 'white',
                         backgroundColor:
-                            activeId === 'counsellorsBtn'
-                                ? 'orange'
-                                : 'whitesmoke',
+                            activeId === 'counsellorsBtn' ? 'orange' : 'gray',
                     }}
                     onClick={() => handleNavigation('counsellorsBtn', '')}
                 />
@@ -41,10 +41,9 @@ function AdminDashboard() {
                         handleNavigation('schedulesBtn', 'manage_schedules')
                     }
                     sx={{
+                        color: 'white',
                         backgroundColor:
-                            activeId === 'schedulesBtn'
-                                ? 'orange'
-                                : 'whitesmoke',
+                            activeId === 'schedulesBtn' ? 'orange' : 'gray',
                     }}
                 />
                 <BottomNavigationAction
@@ -54,8 +53,9 @@ function AdminDashboard() {
                         handleNavigation('eventsBtn', 'manage_events')
                     }
                     sx={{
+                        color: 'white',
                         backgroundColor:
-                            activeId === 'eventsBtn' ? 'orange' : 'whitesmoke',
+                            activeId === 'eventsBtn' ? 'orange' : 'gray',
                     }}
                 />
                 <BottomNavigationAction
@@ -65,8 +65,9 @@ function AdminDashboard() {
                         handleNavigation('clientsBtn', 'manage_clients')
                     }
                     sx={{
+                        color: 'white',
                         backgroundColor:
-                            activeId === 'clientsBtn' ? 'orange' : 'whitesmoke',
+                            activeId === 'clientsBtn' ? 'orange' : 'gray',
                     }}
                 />
             </BottomNavigation>

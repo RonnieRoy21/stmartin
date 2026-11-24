@@ -5,6 +5,7 @@ import Database from '../../database/supabase_db';
 import type { ClientModel } from '../../models/client_model';
 import {
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -19,19 +20,32 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { DeleteForever, Edit } from '@mui/icons-material';
+import { DeleteForever, Edit, Warning } from '@mui/icons-material';
+import ShowSnackBar from '../../components/snackbar';
 
 function ManageClients() {
     const db = new Database();
     const adminUrl = import.meta.env.VITE_ADMIN_URL;
     const [uploadedClients, setUploadedClients] = useState<ClientModel[]>([]);
+    const [isLoadingClients, setIsLoadingclients] = useState<boolean>(false);
     const [openNewClientDialog, setOpenNewClientDialog] =
+        useState<boolean>(false);
+    const [openDeleteClientDialog, setOpenDeleteClientDialog] =
+        useState<boolean>(false);
+    const [openEditClientDialog, setOpenEditClientDialog] =
         useState<boolean>(false);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [selectedGender, setSelectedGender] = useState<string>('');
-    const [selectedAge, setSelectedAge] = useState<number>(12);
+    const [selectedAge, setSelectedAge] = useState<number>();
     const [selectedName, setSelectedName] = useState<string>('');
     const [selectedIssue, setSelectedIssue] = useState<string>('');
+    const [newName, setNewName] = useState<string>('');
+    const [newAge, setNewAge] = useState<number>(12);
+    const [newIssue, setNewIssue] = useState<string>('');
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const [msg, setMsg] = useState<string>('');
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
     const occupations: string[] = ['student', 'dropout', 'working-class'];
     const genders: string[] = ['male', 'female'];
 
@@ -43,7 +57,10 @@ function ManageClients() {
             !selectedIssue ||
             !selectedName
         ) {
-            return window.alert('Missing Fields');
+            return setMsg('Missing Fields');
+        }
+        if (selectedAge < 13) {
+            return setMsg('Age should be 13 or above');
         }
         const body = {
             age: selectedAge,
@@ -59,17 +76,75 @@ function ManageClients() {
                 Authorization: `Bearer ${token}`,
             },
         });
-        console.log('Response: ' + response);
 
         if (response.status === 200) {
-            return window.alert('Client data Uploaded');
+            return setMsg('Client data Uploaded');
         }
-        return window.alert(response.statusText);
+        return setMsg(response.statusText);
     };
 
+    const handleDeleteClient = async (id: string) => {
+        //delete logic
+        setIsDeleting(true);
+        const token = await db.getToken();
+
+        setIsDeleting(true);
+        const response = await axios.delete(
+            `${adminUrl}/clients/delete/${id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        setIsDeleting(false);
+        setOpenDeleteClientDialog(false);
+        return setMsg(
+            response.status === 200 ? response.data : response.statusText
+        );
+    };
+    const handleEditClient = async (id: string) => {
+        //edit logic
+        setIsUpdating(true);
+
+        const token = await db.getToken();
+        if (!newName || !newAge || !newIssue) {
+            return setMsg('Missing fields required');
+        }
+        const body = {
+            new_name: newName,
+            new_age: newAge,
+            new_issue: newIssue,
+        };
+
+        await axios
+            .put(`${adminUrl}/clients/update/${id}`, body, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setIsUpdating(false);
+                setMsg(
+                    response.status === 200
+                        ? response.data
+                        : response.statusText
+                );
+            })
+            .catch((error) => {
+                setIsUpdating(false);
+                setMsg(error.message);
+            })
+            .finally(() => {
+                setOpenEditClientDialog(false);
+            });
+    };
     //fetch clients method
     const fetchClients = async () => {
         const token = await db.getToken();
+        setIsLoadingclients(true);
         const { data, status, statusText } = await axios.get(
             `${adminUrl}/clients/all`,
             {
@@ -79,11 +154,12 @@ function ManageClients() {
                 },
             }
         );
+        setIsLoadingclients(false);
         if (status === 200) {
             setUploadedClients(data);
             return;
         }
-        window.alert(statusText);
+        setMsg(statusText);
     };
 
     //useEfect method
@@ -91,6 +167,11 @@ function ManageClients() {
         fetchClients();
     }, []);
 
+    useEffect(() => {
+        if (msg) {
+            setOpenSnackbar(true);
+        }
+    }, [msg]);
     return (
         <>
             <Button
@@ -121,9 +202,9 @@ function ManageClients() {
 
                         <TextField
                             required
-                            label="Client Age (12 and above)"
+                            label="Client Age (13 and above)"
                             type="number"
-                            value={selectedAge < 12 ? 12 : selectedAge}
+                            value={selectedAge}
                             onChange={(e) =>
                                 setSelectedAge(Number(e.target.value))
                             }
@@ -181,7 +262,9 @@ function ManageClients() {
                     </Button>
                 </DialogActions>
             </Dialog>{' '}
-            {uploadedClients.length > 0 ? (
+            {isLoadingClients ? (
+                <CircularProgress sx={{ alignSelf: 'center' }} />
+            ) : uploadedClients.length > 0 ? (
                 <List sx={{ marginBottom: '10%' }}>
                     {uploadedClients.map((c, index) => {
                         return (
@@ -198,14 +281,152 @@ function ManageClients() {
                                     )}
                                     <Stack
                                         direction={'row-reverse'}
-                                        spacing={'8%'}
+                                        spacing={'10%'}
                                     >
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() =>
+                                                setOpenDeleteClientDialog(true)
+                                            }
+                                        >
+                                            {/**delete uploaded client */}
                                             <DeleteForever />
                                         </IconButton>
-                                        <IconButton>
+                                        <Dialog
+                                            open={openDeleteClientDialog}
+                                            onClose={() =>
+                                                setOpenDeleteClientDialog(false)
+                                            }
+                                        >
+                                            <DialogTitle>
+                                                <Warning>Delete Client</Warning>
+                                            </DialogTitle>
+                                            <DialogContent>
+                                                <Typography>
+                                                    Are you sure you want to
+                                                    delete this client?
+                                                </Typography>
+                                            </DialogContent>
+                                            <DialogActions
+                                                sx={{
+                                                    justifyContent:
+                                                        'space-between',
+                                                }}
+                                            >
+                                                {isDeleting ? (
+                                                    <CircularProgress />
+                                                ) : (
+                                                    <Button
+                                                        onClick={() =>
+                                                            handleDeleteClient(
+                                                                c.id
+                                                            )
+                                                        }
+                                                    >
+                                                        Yes
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    onClick={() =>
+                                                        setOpenDeleteClientDialog(
+                                                            false
+                                                        )
+                                                    }
+                                                >
+                                                    No
+                                                </Button>
+                                            </DialogActions>
+                                        </Dialog>
+                                        <IconButton
+                                            onClick={() => {
+                                                setNewAge(c.age);
+                                                setNewName(c.name);
+                                                setNewIssue(c.presenting_issue);
+                                                setOpenEditClientDialog(true);
+                                            }}
+                                        >
+                                            {/**edit uploaded client */}
                                             <Edit />
                                         </IconButton>
+                                        <Dialog
+                                            open={openEditClientDialog}
+                                            onClose={() =>
+                                                setOpenEditClientDialog(false)
+                                            }
+                                        >
+                                            <DialogTitle>
+                                                <Edit>Edit Client Details</Edit>
+                                            </DialogTitle>
+
+                                            <DialogContent>
+                                                <Stack spacing={'3%'}>
+                                                    <TextField
+                                                        helperText="Name"
+                                                        value={newName}
+                                                        onChange={(e) =>
+                                                            setNewName(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                    <TextField
+                                                        helperText="Age"
+                                                        value={newAge}
+                                                        onChange={(e) =>
+                                                            setNewAge(
+                                                                Number(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            )
+                                                        }
+                                                    />
+                                                    <TextField
+                                                        helperText="Issue"
+                                                        value={newIssue}
+                                                        onChange={(e) =>
+                                                            setNewIssue(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                    <TextField
+                                                        disabled
+                                                        helperText="Gender"
+                                                        value={c.gender}
+                                                    />
+                                                    <TextField
+                                                        disabled
+                                                        helperText="Occupation"
+                                                        value={c.occupation}
+                                                    />
+                                                </Stack>
+                                            </DialogContent>
+                                            <DialogActions>
+                                                {isUpdating ? (
+                                                    <CircularProgress />
+                                                ) : (
+                                                    <Button
+                                                        onClick={() =>
+                                                            handleEditClient(
+                                                                c.id
+                                                            )
+                                                        }
+                                                    >
+                                                        {' '}
+                                                        Confirm
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    onClick={() =>
+                                                        setOpenEditClientDialog(
+                                                            false
+                                                        )
+                                                    }
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </DialogActions>
+                                        </Dialog>
                                     </Stack>
                                 </Paper>
                             </>
@@ -215,6 +436,14 @@ function ManageClients() {
             ) : (
                 <Typography>No Clients yet.</Typography>
             )}
+            <ShowSnackBar
+                open={openSnackbar}
+                message={msg}
+                close={() => {
+                    setOpenSnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

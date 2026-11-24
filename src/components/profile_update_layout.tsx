@@ -1,8 +1,9 @@
 import { Stack, TextField, Button, Typography } from '@mui/material';
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import Database from '../database/supabase_db';
 import { useLocation } from 'react-router';
 import type { UserProfile } from '../models/profile_model';
+import ShowSnackBar from './snackbar';
 
 function UpdateProfile() {
     const db = new Database();
@@ -13,8 +14,10 @@ function UpdateProfile() {
         Number(profile.phone_number)
     );
     const [newPhoto, setNewPhoto] = useState<File | null>(null);
+    const [msg, setMsg] = useState<string>('');
+    const [showSnackbar, setShowsnackbar] = useState<boolean>(false);
 
-    const handleUploadProfile = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleUploadProfilePhoto = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files;
         if (file !== null && file.length > 0) {
             setNewPhoto(file[0]);
@@ -23,15 +26,21 @@ function UpdateProfile() {
     const handleUpdate = async () => {
         //check if both number and name are filled
         if (!newName || !newPhone) {
-            return window.alert("Name and Phone Number can't be empty");
+            return setMsg("Name and Phone Number can't be empty");
         }
         const response = await db.updateCounsellorProfile({
             name: newName,
             phone_number: String(newPhone),
             photo: newPhoto,
         });
-        return window.alert(response);
+        return setMsg(response);
     };
+
+    useEffect(() => {
+        if (msg) {
+            setShowsnackbar(true);
+        }
+    }, [msg]);
 
     return (
         <>
@@ -54,13 +63,21 @@ function UpdateProfile() {
                 <TextField
                     type="file"
                     helperText="Select profile photo"
-                    onChange={handleUploadProfile}
+                    onChange={handleUploadProfilePhoto}
                 />
 
                 <Stack direction={'row'}>
                     <Button onClick={handleUpdate}>Update</Button>
                 </Stack>
             </Stack>
+            <ShowSnackBar
+                open={showSnackbar}
+                message={msg}
+                close={() => {
+                    setShowsnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

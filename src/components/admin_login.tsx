@@ -6,54 +6,67 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Database from '../database/supabase_db';
 import axios from 'axios';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import ShowSnackBar from './snackbar';
 
 function AdminLogin() {
     const navigate = useNavigate();
     const adminUrl = import.meta.env.VITE_ADMIN_URL;
-
+    const db = new Database();
     const [adminEmail, setAdminEmail] = useState<string>('');
     const [adminPassword, setAdminPassword] = useState<string>('');
     const [adminTotp, setAdminTotp] = useState<string>('');
     const [otpFieldEnabled, setOtpFieldEnabled] = useState<boolean>(false);
     const [attemptingLogin, setAttemptingLogin] = useState<boolean>(false);
     const [passwordVisible, setpasswordVisible] = useState<boolean>(false);
-    const db = new Database();
+    const [msg, setMsg] = useState<string>('');
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+
+    //admin login method
     const handleAdminLogin = async () => {
         if (adminEmail.trim().length === 0) {
-            return window.alert('Email is required');
+            return setMsg('Email is required');
         }
         if (adminPassword.trim().length === 0) {
-            return window.alert('Password is required');
+            return setMsg('Password is required');
         }
 
-        const token = await db.adminSignIn(adminEmail, adminPassword);
+        const body = {
+            email: adminEmail,
+            password: adminPassword,
+        };
 
-        if (token !== undefined && token !== null) {
-            setAttemptingLogin(true);
-            try {
-                const response = await axios.get(`${adminUrl}/verification`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (response.status === 200) {
-                    setAttemptingLogin(false);
-                    setOtpFieldEnabled(true);
-                    return window.alert(response.data['message']);
-                }
-                return window.alert(response.statusText.split(':')[1]);
-            } catch (err) {
+        const response = await axios.post(`${adminUrl}/login`, body, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (response.status !== 200) {
+            return setMsg(response.statusText);
+        }
+        const token: string = response.data['token'];
+
+        setAttemptingLogin(true);
+        try {
+            const response = await axios.get(`${adminUrl}/verification`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (response.status === 200) {
                 setAttemptingLogin(false);
-                return window.alert(String(err).split(':')[1]);
+                setOtpFieldEnabled(true);
+                return setMsg(response.data['message']);
             }
+            setAttemptingLogin(false);
+            return setMsg(response.statusText.split(':')[1]);
+        } catch (err) {
+            setAttemptingLogin(false);
+            return setMsg(String(err).split(':')[1]);
         }
-        setAttemptingLogin(false);
     };
 
     const handleVerification = async (code: string) => {
@@ -71,15 +84,21 @@ function AdminLogin() {
         if (response.status === 200) {
             const isVerified: boolean = response.data['verified'];
             if (isVerified) {
-                window.alert('Verified');
+                setMsg('Verified...');
                 navigate('dashboard');
                 return;
             } else {
-                return window.alert('Invalid or expired code.');
+                return setMsg('Invalid or expired code.');
             }
         }
-        return window.alert(response.statusText);
+        return setMsg(response.statusText);
     };
+
+    useEffect(() => {
+        if (msg) {
+            setOpenSnackbar(true);
+        }
+    }, [msg]);
 
     return (
         <>
@@ -172,6 +191,14 @@ function AdminLogin() {
                     <Button onClick={() => navigate('/')}>Back</Button>
                 </Stack>
             </Stack>
+            <ShowSnackBar
+                open={openSnackbar}
+                message={msg}
+                close={() => {
+                    setOpenSnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

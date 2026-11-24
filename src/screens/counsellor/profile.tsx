@@ -3,12 +3,15 @@ import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import Database from '../../database/supabase_db';
 import type { UserProfile } from '../../models/profile_model';
+import ShowSnackBar from '../../components/snackbar';
 
 function ProfilePage() {
     const navigate = useNavigate();
+    const db = new Database();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const db = new Database();
+    const [msg, setMsg] = useState<string>('');
+    const [showSnackbar, setShowsnackbar] = useState<boolean>(false);
 
     const handleViewProfile = () => {
         navigate('', {
@@ -24,7 +27,7 @@ function ProfilePage() {
         setIsLoading(true);
         const res = await db.fetchCounsellorById();
         if (typeof res === 'string') {
-            return window.alert(res);
+            return setMsg(res);
         }
         setProfile(res);
         setIsLoading(false);
@@ -38,6 +41,11 @@ function ProfilePage() {
         handleViewProfile();
     }, [profile]);
 
+    useEffect(() => {
+        if (msg) {
+            setShowsnackbar(true);
+        }
+    }, [msg]);
     return isLoading ? (
         <CircularProgress sx={{ alignSelf: 'center' }} />
     ) : (
@@ -63,6 +71,14 @@ function ProfilePage() {
                 </Stack>
                 <Outlet />
             </Stack>
+            <ShowSnackBar
+                open={showSnackbar}
+                message={msg}
+                close={() => {
+                    setShowsnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

@@ -12,11 +12,12 @@ interface cardItem {
 
 function HomePage() {
     const navigate = useNavigate();
+
     const cards: Array<cardItem> = [
         {
             id: 'schedules',
             title: 'View My Schedules',
-            content: 'your views in one place',
+            content: 'All the schedules you have set.',
             actionTitle: 'View All',
         },
         {
@@ -28,8 +29,8 @@ function HomePage() {
         {
             id: 'clients',
             title: 'Clients',
-            content: 'Pick a client',
-            actionTitle: 'Make an impact today.',
+            content: 'Help a client,make an impact.',
+            actionTitle: 'View clients',
         },
         {
             id: 'profile',
@@ -42,13 +43,8 @@ function HomePage() {
     return (
         <>
             <Stack spacing={2}>
-                <Typography
-                    variant="subtitle2"
-                    sx={{
-                        marginBottom: '1%',
-                    }}
-                >
-                    Everything you need,it's right here
+                <Typography key={'homeTitle'} variant="h5" sx={{}}>
+                    Welcome back
                 </Typography>
                 <Stack
                     spacing={1}
@@ -65,13 +61,14 @@ function HomePage() {
                         >
                             When are you Available?
                         </CardContent>
+
                         <CardContent>{<SetAvailability />}</CardContent>
                     </Card>
                     <Stack spacing={2}>
                         {cards.map((card, index) => {
                             return (
                                 <CreateCard
-                                    cardKey={index}
+                                    key={index}
                                     id={card.id}
                                     header={card.title}
                                     content={card.content}

@@ -1,5 +1,6 @@
 import {
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -15,6 +16,7 @@ import {
 import Database from '../../database/supabase_db';
 import { useEffect, useState } from 'react';
 import { type StoredScheduleItem } from '../../models/schedule_item';
+import ShowSnackBar from '../../components/snackbar';
 
 const db = new Database();
 
@@ -29,30 +31,44 @@ function SchedulesPage() {
         []
     );
     const [viewActive, setViewActive] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isCancelling, setISCancelling] = useState<boolean>(false);
+    const [msg, setMsg] = useState<string>('');
+    const [showSnackbar, setShowsnackbar] = useState<boolean>(false);
 
     const handleCancel = async (id: number, reason: string) => {
         try {
+            setISCancelling(true);
             const response = await db.cancelSchedule(id, reason);
-            if (response === true) {
+            setISCancelling(false);
+            if (typeof response === 'boolean') {
                 setCancelledSchedules((prev) => [...prev, prev.push(id)]);
-                return window.alert('Schedule cancelled');
+                return setMsg('Schedule cancelled');
             }
-            return window.alert(response);
+            return setMsg(response);
         } catch (err) {
-            return window.alert('An Error Occured.');
+            return setMsg('An Error Occured.');
         }
     };
 
     useEffect(() => {
         const getSchedules = async () => {
+            setIsLoading(true);
             const result = await db.getSchedules();
             if (typeof result === 'string') {
-                return window.alert(result);
+                return setMsg(result);
             }
+            setIsLoading(false);
             setMySchedules(result);
         };
         getSchedules();
     }, [cancelledSchedules]);
+
+    useEffect(() => {
+        if (msg) {
+            setShowsnackbar(true);
+        }
+    }, [msg]);
 
     return (
         <>
@@ -93,113 +109,135 @@ function SchedulesPage() {
                 </Button>
             </Stack>
             <List>
-                {mySchedules
-                    .filter((s) => s.is_cancelled === !viewActive)
-                    .map((s, index) => {
-                        return (
-                            <>
-                                <ListItem
-                                    key={index}
-                                    sx={{
-                                        backgroundColor: 'beige',
-                                        color: 'black',
-                                        marginBottom: '1%',
-                                    }}
-                                >
-                                    <ListItemAvatar sx={{ padding: '2%' }}>
-                                        {s.time}
-                                    </ListItemAvatar>
-                                    <Stack>
-                                        <ListItemText>
-                                            On {s.day}, Date: {s.date}
-                                        </ListItemText>
-                                        <ListItemText>
-                                            {s.month}, {s.year}
-                                        </ListItemText>
-                                        <ListItemText>
-                                            {s.is_cancelled ? (
-                                                <>
-                                                    <Typography>
-                                                        Reason:{' '}
-                                                        {s.cancel_reason}
-                                                    </Typography>
-                                                </>
-                                            ) : null}
-                                        </ListItemText>
-                                    </Stack>
-                                    {s.is_cancelled ? null : (
-                                        <Button
-                                            disabled={cancelledSchedules.some(
-                                                (n) => n === s.id
-                                            )}
-                                            sx={{
-                                                backgroundColor: 'orange',
-                                                color: 'black',
-                                                marginLeft: 'auto',
-                                                alignSelf: 'end',
-                                                borderRadius: '10%',
-                                            }}
-                                            onClick={() => {
-                                                setCancelDialogOpen(true);
-                                            }}
-                                        >
-                                            Cancel
-                                        </Button>
-                                    )}
-                                </ListItem>
-
-                                <Dialog
-                                    open={cancelDialogOpen}
-                                    onClose={() => setCancelDialogOpen(false)}
-                                    sx={{ alignContent: 'space-evenly' }}
-                                >
-                                    <DialogTitle>Provide a reason</DialogTitle>
-                                    <DialogContent>
-                                        <TextField
-                                            multiline={true}
-                                            id="reasonController"
-                                            label="Why cancel?"
-                                            value={cancelReason}
-                                            onChange={(e) =>
-                                                setCancelReason(e.target.value)
-                                            }
-                                        />
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Stack direction={'row'}>
+                {isLoading ? (
+                    <CircularProgress sx={{ alignSelf: 'center' }} />
+                ) : (
+                    mySchedules
+                        .filter((s) => s.is_cancelled === !viewActive)
+                        .map((s, index) => {
+                            return (
+                                <>
+                                    <ListItem
+                                        key={index}
+                                        sx={{
+                                            backgroundColor: 'beige',
+                                            color: 'black',
+                                            marginBottom: '1%',
+                                        }}
+                                    >
+                                        <ListItemAvatar sx={{ padding: '2%' }}>
+                                            {s.time}
+                                        </ListItemAvatar>
+                                        <Stack>
+                                            <ListItemText>
+                                                On {s.day}, Date: {s.date}
+                                            </ListItemText>
+                                            <ListItemText>
+                                                {s.month}, {s.year}
+                                            </ListItemText>
+                                            <ListItemText>
+                                                {s.is_cancelled ? (
+                                                    <>
+                                                        <Typography>
+                                                            Reason:{' '}
+                                                            {s.cancel_reason}
+                                                        </Typography>
+                                                    </>
+                                                ) : null}
+                                            </ListItemText>
+                                        </Stack>
+                                        {s.is_cancelled ? null : isCancelling ? (
+                                            <CircularProgress />
+                                        ) : (
                                             <Button
-                                                variant="contained"
+                                                disabled={cancelledSchedules.some(
+                                                    (n) => n === s.id
+                                                )}
+                                                sx={{
+                                                    backgroundColor: 'orange',
+                                                    color: 'black',
+                                                    marginLeft: 'auto',
+                                                    alignSelf: 'end',
+                                                    borderRadius: '10%',
+                                                }}
                                                 onClick={() => {
-                                                    if (
-                                                        cancelReason.trim()
-                                                            .length === 0
-                                                    ) {
-                                                        return window.alert(
-                                                            "Reason can't be empty"
-                                                        );
-                                                    }
-                                                    handleCancel(
-                                                        s.id,
-                                                        cancelReason
-                                                    );
+                                                    setCancelDialogOpen(true);
                                                 }}
                                             >
-                                                Cancel Schedule
+                                                Cancel
                                             </Button>
-                                            <Button
-                                                onClick={() =>
-                                                    setCancelDialogOpen(false)
+                                        )}
+                                    </ListItem>
+
+                                    <Dialog
+                                        open={cancelDialogOpen}
+                                        onClose={() =>
+                                            setCancelDialogOpen(false)
+                                        }
+                                        sx={{ alignContent: 'space-evenly' }}
+                                    >
+                                        <DialogTitle>
+                                            Provide a reason
+                                        </DialogTitle>
+                                        <DialogContent>
+                                            <TextField
+                                                multiline={true}
+                                                id="reasonController"
+                                                label="Why cancel?"
+                                                value={cancelReason}
+                                                onChange={(e) =>
+                                                    setCancelReason(
+                                                        e.target.value
+                                                    )
                                                 }
-                                            >
-                                                Exit
-                                            </Button>
-                                        </Stack>
-                                    </DialogActions>
-                                </Dialog>
-                            </>
-                        );
-                    })}
+                                            />
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Stack direction={'row'}>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={() => {
+                                                        if (
+                                                            cancelReason.trim()
+                                                                .length === 0
+                                                        ) {
+                                                            return window.alert(
+                                                                "Reason can't be empty"
+                                                            );
+                                                        }
+                                                        handleCancel(
+                                                            s.id,
+                                                            cancelReason
+                                                        );
+                                                    }}
+                                                >
+                                                    Cancel Schedule
+                                                </Button>
+                                                <Button
+                                                    onClick={() =>
+                                                        setCancelDialogOpen(
+                                                            false
+                                                        )
+                                                    }
+                                                >
+                                                    Exit
+                                                </Button>
+                                            </Stack>
+                                        </DialogActions>
+                                    </Dialog>
+                                </>
+                            );
+                        })
+                )}
             </List>
+            <ShowSnackBar
+                open={showSnackbar}
+                message={msg}
+                close={() => {
+                    setShowsnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

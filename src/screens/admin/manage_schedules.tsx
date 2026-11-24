@@ -76,6 +76,7 @@ function ManageSchedules() {
                     direction={'row'}
                     sx={{
                         justifyContent: 'space-around',
+                        marginBottom: '10%',
                     }}
                 >
                     <TextField

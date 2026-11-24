@@ -3,6 +3,7 @@ import type { CounsellorProfUpdate } from '../models/counsellor_model';
 import { supabaseClient } from './supabaseConfig';
 import type { UserProfile } from '../models/profile_model';
 import type { EventItem } from '../models/event_model';
+import type { ClientModel } from '../models/client_model';
 
 class Database {
     private supabase = supabaseClient;
@@ -37,23 +38,6 @@ class Database {
         })();
 
         return this.userIdPromise;
-    }
-
-    async adminSignIn(email: string, paswd: string): Promise<string | boolean> {
-        try {
-            const { data, error } = await this.supabase.auth.signInWithPassword(
-                {
-                    email: email,
-                    password: paswd,
-                }
-            );
-            if (error) {
-                return false;
-            }
-            return data.session.access_token;
-        } catch (err) {
-            return false;
-        }
     }
 
     async getEvents(): Promise<EventItem[] | string> {
@@ -130,7 +114,8 @@ class Database {
             return 'Unable to login.' + error.message;
         }
         this.userId = data.user.id;
-        return true;
+
+        return this.userId !== null;
     }
 
     //fetch schedules
@@ -140,7 +125,9 @@ class Database {
         const { data, error } = await this.supabase
             .from('schedules')
             .select('*')
+            .order('month', { ascending: true })
             .order('date', { ascending: true })
+            .order('time', { ascending: true })
             .eq('counsellor_id', this.userId);
         if (error === null) {
             rows = data;
@@ -151,21 +138,20 @@ class Database {
     }
 
     //post schedule
-    async postSchedule(schedule: ScheduleItem): Promise<string | boolean> {
-        if (this.userId === null) {
-            this.userId = await this.getUserId();
-        }
-        const { error } = await this.supabase.from('schedules').insert({
-            counsellor_id: this.userId,
-            time: schedule.time,
-            day: schedule.day,
-            date: schedule.date,
-            month: schedule.month,
-            year: schedule.year,
-        });
+    async postSchedule(schedules: ScheduleItem[]): Promise<string | boolean> {
+        this.userId = await this.getUserId();
+
+        console.log(schedules);
+
+        const { error } = await this.supabase
+            .from('schedules')
+            .insert(schedules)
+            .eq('counsellor_id', this.userId);
         if (error === null) {
             return true;
         } else {
+            console.log(error);
+
             return error.message;
         }
     }
@@ -278,22 +264,28 @@ class Database {
             if (error) {
                 return 'Failed to retrieve clients';
             }
+            console.log(data);
+
             return data;
         } catch (err) {
             return String(err);
         }
     }
-    async assignCounsellor(clientId: string) {
+    async assignCounsellor(client: ClientModel) {
         try {
             const id = await this.getUserId();
-            const { error } = await this.supabase
+            const { data, error } = await this.supabase
                 .from('clients')
                 .update({ assigned_counsellor_id: id })
-                .eq('id', clientId);
+                .eq('id', client.id)
+                .select('*');
             if (error) {
-                return 'Could not assign you to the client';
+                return 'Error occured.';
             }
-            return 'Congratulations,you have been assigned a new client';
+            if (data.length > 0) {
+                return 'Congratulations,you have been assigned a new client';
+            }
+            return 'Unable to assign you the selected client';
         } catch (err) {
             return String(err);
         }
