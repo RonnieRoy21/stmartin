@@ -10,18 +10,21 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
+import ShowSnackBar from './snackbar';
 
 function ViewEvents() {
     const db = new Database();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [events, setEvents] = useState<EventItem[]>([]);
+    const [msg, setMsg] = useState<string>('');
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
     const fetchEvents = async () => {
         const e = await db.getEvents();
         if (typeof e === 'string') {
             setIsLoading(false);
-            return window.alert(e);
+            return setMsg(e);
         }
         setIsLoading(false);
         setEvents(e);
@@ -32,6 +35,11 @@ function ViewEvents() {
         fetchEvents();
     }, []);
 
+    useEffect(() => {
+        if (msg) {
+            setOpenSnackbar(true);
+        }
+    }, [msg]);
     return (
         <>
             {isLoading && events.length === 0 ? (
@@ -108,6 +116,14 @@ function ViewEvents() {
                     </List>
                 </Stack>
             )}
+            <ShowSnackBar
+                open={openSnackbar}
+                message={msg}
+                close={() => {
+                    setOpenSnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

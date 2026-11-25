@@ -23,6 +23,9 @@ function PickClient() {
     const [availableClients, setAvailableClients] = useState<ClientModel[]>([]);
     const [confirmClientSelection, setConfirmClientSelection] =
         useState<boolean>(false);
+    const [selectedClient, setSelectedClient] = useState<ClientModel | null>(
+        null
+    );
     const [selectedFilter, setSelectedFilter] = useState<string>('all clients');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [msg, setMsg] = useState<string>('');
@@ -32,6 +35,7 @@ function PickClient() {
     const handleAssign = async (client: ClientModel) => {
         const response = await db.assignCounsellor(client);
         setConfirmClientSelection(false);
+        setSelectedClient(null);
         return setMsg(response);
     };
 
@@ -70,6 +74,7 @@ function PickClient() {
     useEffect(() => {
         if (msg) {
             setShowSnackBar(true);
+            fetchClients();
         }
     }, [msg]);
 
@@ -108,6 +113,8 @@ function PickClient() {
                           )
                         : availableClients
                     ).map((c, index) => {
+                        //log each client
+
                         return (
                             <Paper
                                 key={index}
@@ -122,9 +129,10 @@ function PickClient() {
                                     ) : (
                                         <Button
                                             variant="contained"
-                                            onClick={() =>
-                                                setConfirmClientSelection(true)
-                                            }
+                                            onClick={() => {
+                                                setSelectedClient(c);
+                                                setConfirmClientSelection(true);
+                                            }}
                                         >
                                             Select
                                         </Button>
@@ -149,9 +157,12 @@ function PickClient() {
                                                 <Button
                                                     variant="contained"
                                                     onClick={() => {
-                                                        console.log(c);
+                                                        if (!selectedClient)
+                                                            return;
 
-                                                        handleAssign(c);
+                                                        handleAssign(
+                                                            selectedClient
+                                                        );
                                                     }}
                                                 >
                                                     Confirm

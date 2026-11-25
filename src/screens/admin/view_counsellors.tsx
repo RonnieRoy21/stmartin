@@ -13,6 +13,7 @@ import type { Counsellor } from '../../models/counsellor_model';
 import { useEffect, useState } from 'react';
 import Database from '../../database/supabase_db';
 import axios from 'axios';
+import ShowSnackBar from '../../components/snackbar';
 
 function ViewCounsellors() {
     const db = new Database();
@@ -21,13 +22,16 @@ function ViewCounsellors() {
     const [isLoadingCounsellors, setIsLoadingcounsellors] =
         useState<boolean>(false);
 
+    const [msg, setMsg] = useState<string>('');
+    const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
+
     useEffect(() => {
         //fetch counsellors
         const getCounsellors = async () => {
             setIsLoadingcounsellors(true);
             const token = await db.getToken();
             if (typeof token === 'boolean') {
-                return window.alert('Session is expired,try to login again');
+                return setMsg('Session is expired,try to login again');
             }
             const res = await axios.get(`${adminUrl}/counsellors/profiles`, {
                 headers: {
@@ -36,13 +40,19 @@ function ViewCounsellors() {
                 },
             });
             if (res.status !== 200) {
-                return window.alert(res.statusText);
+                return setMsg(res.statusText);
             }
             setIsLoadingcounsellors(false);
             setCounsellorsData(res.data);
         };
         getCounsellors();
     }, []);
+
+    useEffect(() => {
+        if (msg) {
+            setShowSnackbar(true);
+        }
+    }, [msg]);
 
     return (
         <>
@@ -85,6 +95,14 @@ function ViewCounsellors() {
                     </TableContainer>
                 </Stack>
             )}
+            <ShowSnackBar
+                open={showSnackbar}
+                message={msg}
+                close={() => {
+                    setShowSnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }

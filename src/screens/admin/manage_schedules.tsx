@@ -16,6 +16,7 @@ import Database from '../../database/supabase_db';
 import axios from 'axios';
 import type { SetSchedules } from '../../models/schedule_item';
 import SearchIcon from '@mui/icons-material/Search';
+import ShowSnackBar from '../../components/snackbar';
 
 function ManageSchedules() {
     const db = new Database();
@@ -25,14 +26,14 @@ function ManageSchedules() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [activeFilter, setActiveFilter] = useState<boolean>(true);
+    const [msg, setMsg] = useState<string>('');
+    const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchSchedules = async () => {
             const token = await db.getToken();
             if (typeof token === 'boolean') {
-                return window.alert(
-                    'Session may be expired, try to login again.'
-                );
+                return setMsg('Session may be expired, try to login again.');
             }
             setIsLoading(true);
             const result = await axios.get(
@@ -46,7 +47,7 @@ function ManageSchedules() {
             );
 
             if (result.status !== 200) {
-                return window.alert(result.statusText);
+                return setMsg(result.statusText);
             }
             setIsLoading(false);
             setSchedules(result.data);
@@ -67,6 +68,12 @@ function ManageSchedules() {
             setSchedulesByName(schedules);
         }
     };
+
+    useEffect(() => {
+        if (msg) {
+            setShowSnackbar(true);
+        }
+    }, [msg]);
 
     return (
         <>
@@ -175,6 +182,14 @@ function ManageSchedules() {
                     </List>
                 )}
             </Stack>
+            <ShowSnackBar
+                open={showSnackbar}
+                message={msg}
+                close={() => {
+                    setShowSnackbar(false);
+                    setMsg('');
+                }}
+            />
         </>
     );
 }
