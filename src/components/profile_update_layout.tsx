@@ -1,22 +1,27 @@
 import { Stack, TextField, Button, Typography } from '@mui/material';
 import { useEffect, useState, type ChangeEvent } from 'react';
 import Database from '../database/supabase_db';
-import { useLocation } from 'react-router';
 import type { UserProfile } from '../models/profile_model';
 import ShowSnackBar from './snackbar';
 
 function UpdateProfile() {
     const db = new Database();
-    const location = useLocation();
-    const profile: UserProfile = location.state;
-    const [newName, setNewName] = useState<string>(profile.name);
-    const [newPhone, setNewPhone] = useState<number>(
-        Number(profile.phone_number)
-    );
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [newName, setNewName] = useState<string>();
+    const [newPhone, setNewPhone] = useState<number>();
     const [newPhoto, setNewPhoto] = useState<File | null>(null);
     const [msg, setMsg] = useState<string>('');
     const [showSnackbar, setShowsnackbar] = useState<boolean>(false);
 
+    const fetchProfile = async () => {
+        const response = await db.fetchCounsellorById();
+        if (typeof response === 'string') {
+            setMsg(response);
+            return;
+        }
+
+        setProfile(response);
+    };
     const handleUploadProfilePhoto = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files;
         if (file !== null && file.length > 0) {
@@ -35,6 +40,17 @@ function UpdateProfile() {
         });
         return setMsg(response);
     };
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    useEffect(() => {
+        if (profile) {
+            setNewName(profile.name);
+            setNewPhone(Number(profile.phone_number));
+        }
+    }, [profile]);
 
     useEffect(() => {
         if (msg) {

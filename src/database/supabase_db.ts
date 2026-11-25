@@ -185,11 +185,12 @@ class Database {
         const { data, error } = await this.supabase
             .from('counsellors')
             .select('*')
-            .eq('id', id);
-        if (error !== null) {
+            .eq('id', id)
+            .single();
+        if (error) {
             return "Can't retrieve your profile";
         }
-        const profile: UserProfile = data[0];
+        const profile: UserProfile = data;
 
         return profile;
     }
