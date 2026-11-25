@@ -147,7 +147,16 @@ function LoginForm() {
                         Create Account
                     </Button>
                 </Stack>
-
+                <Button
+                    onClick={() => {
+                        navigate('/reset-password');
+                    }}
+                    sx={{
+                        fontSize: '70%',
+                    }}
+                >
+                    Forgot Password ?
+                </Button>
                 <Button
                     variant="outlined"
                     onClick={() => navigate('/admin')}

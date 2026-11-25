@@ -16,12 +16,14 @@ import ViewProfile from './components/view_profile';
 import UpdateProfile from './components/profile_update_layout';
 import PickClient from './screens/counsellor/pick_client';
 import ManageClients from './screens/admin/manage_clients';
+import ResetPassword from './screens/counsellor/reset_password';
 
 function App() {
     return (
         <Routes>
             <Route index path="/" element={<LoginForm />} />
             <Route path="/signUp" element={<SignUpForm />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/**admin routes */}
             <Route path="/admin" element={<AdminMainScreen />}>
