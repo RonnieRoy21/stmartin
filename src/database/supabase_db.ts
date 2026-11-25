@@ -12,6 +12,13 @@ class Database {
 
     constructor() {}
 
+    async logoutUser(): Promise<string | boolean> {
+        const { error } = await this.supabase.auth.signOut();
+        if (error) {
+            return 'Sign out Failed';
+        }
+        return true;
+    }
     async getUserId(): Promise<string | null> {
         if (this.userId !== null) {
             return this.userId;

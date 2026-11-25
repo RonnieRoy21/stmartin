@@ -42,8 +42,17 @@ function HomePage() {
 
     return (
         <>
-            <Stack spacing={2}>
-                <Typography key={'homeTitle'} variant="h5" sx={{}}>
+            <Stack spacing={2} sx={{ marginBottom: '10%' }}>
+                <Typography
+                    key={'homeTitle'}
+                    variant="h5"
+                    sx={{
+                        position: 'sticky',
+                        top: 0,
+                        backgroundColor: 'whitesmoke',
+                        zIndex: 50,
+                    }}
+                >
                     Welcome back
                 </Typography>
                 <Stack

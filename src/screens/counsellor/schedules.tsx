@@ -116,9 +116,8 @@ function SchedulesPage() {
                         .filter((s) => s.is_cancelled === !viewActive)
                         .map((s, index) => {
                             return (
-                                <>
+                                <Stack key={index}>
                                     <ListItem
-                                        key={index}
                                         sx={{
                                             backgroundColor: 'beige',
                                             color: 'black',
@@ -137,12 +136,10 @@ function SchedulesPage() {
                                             </ListItemText>
                                             <ListItemText>
                                                 {s.is_cancelled ? (
-                                                    <>
-                                                        <Typography>
-                                                            Reason:{' '}
-                                                            {s.cancel_reason}
-                                                        </Typography>
-                                                    </>
+                                                    <Typography>
+                                                        Reason:{' '}
+                                                        {s.cancel_reason}
+                                                    </Typography>
                                                 ) : null}
                                             </ListItemText>
                                         </Stack>
@@ -225,7 +222,7 @@ function SchedulesPage() {
                                             </Stack>
                                         </DialogActions>
                                     </Dialog>
-                                </>
+                                </Stack>
                             );
                         })
                 )}
